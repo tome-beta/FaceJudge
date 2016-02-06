@@ -19,6 +19,10 @@ namespace MakeSVMFile
 
     class MakeSvmFile
     {
+        const int SMALL_IMAGE_LIMIT = 100;  //顔画像を拡大対象にする
+        const int IMAGE_RESIZE_RATE = 4;    //拡大率
+
+        
         public void Exec()
         {
             //学習するファイルを読み込む
@@ -49,9 +53,22 @@ namespace MakeSVMFile
 
                 using (IplImage img = new IplImage(input_file_path))
                 {
+                    IplImage tmp_image;
+                    //サイズが小さければ拡大して使う
+                    if(img.Size.Width < SMALL_IMAGE_LIMIT)
+                    {
+                        tmp_image = Cv.CreateImage(new CvSize(img.Width * IMAGE_RESIZE_RATE, img.Height * IMAGE_RESIZE_RATE), BitDepth.U8, 3);
+                        Cv.Resize(img,tmp_image);
+                    }
+                    else
+                    {
+                        tmp_image = Cv.CreateImage(new CvSize(img.Width, img.Height), BitDepth.U8, 3);
+                        Cv.Resize(img, tmp_image);
+                    }
+
                     //グレースケールに変換
-                    IplImage gray_image = Cv.CreateImage(new CvSize(img.Width,img.Height),BitDepth.U8,1);
-                    Cv.CvtColor(img, gray_image, ColorConversion.BgrToGray);
+                    IplImage gray_image = Cv.CreateImage(new CvSize(tmp_image.Width, tmp_image.Height), BitDepth.U8, 1);
+                    Cv.CvtColor(tmp_image, gray_image, ColorConversion.BgrToGray);
 
                     //発見した矩形
                     //TODO まゆの位置も有る方がいいかも
@@ -60,7 +77,7 @@ namespace MakeSVMFile
                     this.MouthResult = Cv.HaarDetectObjects(gray_image, mouth_cascade, strage);
 
                     //デバッグ用の表示
-                    DebugPrint(img, read_count);
+                    DebugPrint(tmp_image, read_count);
 
                     //左眼、右目、鼻、口の矩形を確定させる。
                     DecidePartsRect(gray_image);
@@ -211,8 +228,7 @@ namespace MakeSVMFile
         {
             string read_list = @"";
 //            read_list = @"I:\myprog\github\kubokinJudge\data\kubota_face\kubota_face_list.txt";
-            read_list = @"I:\myprog\github\kubokinJudge\data\fujikin_face\fujikin_face_list.txt";
-
+            read_list = @"I:\myprog\github\data\fujikin_face\fujikin_face_list.txt";
             //リストファイルと読みこんでファイル名をとる
             using (StreamReader sr = new StreamReader(read_list))
             {
