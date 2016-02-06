@@ -77,13 +77,13 @@ namespace MakeSVMFile
                     this.MouthResult = Cv.HaarDetectObjects(gray_image, mouth_cascade, strage);
 
                     //デバッグ用の表示
-                    DebugPrint(tmp_image, read_count);
+//                    DebugPrint(tmp_image, read_count);
 
                     //左眼、右目、鼻、口の矩形を確定させる。
                     DecidePartsRect(gray_image);
 
                     //パーツ確定後
-//                    DebugPrint2(img, read_count);
+                    DebugPrint2(tmp_image, read_count);
 
 
                     //基点を作る
@@ -102,13 +102,21 @@ namespace MakeSVMFile
         /// </summary>
         private void DecidePartsRect(IplImage img)
         {
-            //両目の矩形を探す　左眼は画像の半分より左で逆は右
+            this.LeftEyeRect = new CvRect(0, 0, 0, 0);
+            this.RightEyeRect = new CvRect(0, 0, 0, 0);
+            this.NoseRect = new CvRect(0, 0, 0, 0);
+            this.MouthRect = new CvRect(0, 0, 0, 0);
+
+            //矩形の選別に使う
+            int image_half_y = img.Height / 2;
             int image_half_x = img.Width / 2; 
+
+            //両目の矩形を探す　左眼は画像の半分より左で逆は右
             for (int i = 0; i < this.EyeResult.Total; i++)
             {
                 CvRect rect = this.EyeResult[i].Value.Rect;
                 int rect_size = rect.Width * rect.Height;
-                if (rect.X <= image_half_x)
+                if (rect.X <= image_half_x + 10)
                 {
                     //サイズの大きい矩形を採用
                     if (LeftEyeRect.Width * LeftEyeRect.Height <= rect_size)
@@ -116,7 +124,8 @@ namespace MakeSVMFile
                         LeftEyeRect = rect;
                     }
                 }
-                else
+
+                if (rect.X >= image_half_x - 10)
                 {
                     //サイズの大きい矩形を採用
                     if (RightEyeRect.Width * RightEyeRect.Height <= rect_size)
@@ -131,23 +140,43 @@ namespace MakeSVMFile
             {
                 CvRect rect = this.NoseResult[i].Value.Rect;
                 int rect_size = rect.Width * rect.Height;
+
+                //画像の中央にあるはず
+                if ( !(rect.X <= image_half_x) || !(image_half_x < rect.X + rect.Width))
+                {
+                    continue;
+                }
+
+                if (!(rect.Y <= image_half_y) || !(image_half_y < rect.Y + rect.Height))
+                {
+                    continue;
+                }
+
+
                 //サイズの大きい矩形を採用
                 if (NoseRect.Width * NoseRect.Height <= rect_size)
                 {
                     NoseRect = rect;
                 }
+
             }
 
-            //鼻の矩形を確定させる。
+            //口の矩形を確定させる。
             for (int i = 0; i < this.MouthResult.Total; i++)
             {
                 CvRect rect = this.MouthResult[i].Value.Rect;
                 int rect_size = rect.Width * rect.Height;
-                //サイズの大きい矩形を採用
-                if (MouthRect.Width * MouthRect.Height <= rect_size)
+                
+                //画像の下半分
+                if (rect.Y >=  image_half_y)
                 {
-                    MouthRect = rect;
+                    //サイズの大きい矩形を採用
+                    if (MouthRect.Width * MouthRect.Height <= rect_size)
+                    {
+                        MouthRect = rect;
+                    }
                 }
+
             }
         }
 
@@ -175,7 +204,7 @@ namespace MakeSVMFile
 
             using (new CvWindow(img))
             {
-                string out_name = @"out\decide_parts" + count + @".jpeg";
+                string out_name = @"I:\myprog\github\out\decide_parts" + count + @".jpeg";
                 Cv.SaveImage(out_name, img);
                 Cv.WaitKey();
             }                           
@@ -215,7 +244,7 @@ namespace MakeSVMFile
 
             using (new CvWindow(img))
             {
-                string out_name = @"out\out" + count + @".jpeg";
+                string out_name = @"I:\myprog\github\out\out" + count + @".jpeg";
                 Cv.SaveImage(out_name, img);
                 Cv.WaitKey();
             }                           
