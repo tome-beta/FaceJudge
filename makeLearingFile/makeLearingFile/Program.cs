@@ -58,21 +58,23 @@ namespace makeLearingFile
                     using (IplImage img = new IplImage(input_file_path))
                     {
                         //グレースケールに変換
-                        IplImage gray_image = Cv.CreateImage(new CvSize(img.Width,img.Height),BitDepth.U8,1);
-                        Cv.CvtColor(img, gray_image, ColorConversion.BgrToGray);
-
-                        //発見した矩形
-                        var result = Cv.HaarDetectObjects(gray_image,cascade, strage);
-                        for (int i = 0; i < result.Total; i++)
+                        using( IplImage gray_image = Cv.CreateImage(new CvSize(img.Width,img.Height),BitDepth.U8,1) )
                         {
-                            //矩形の大きさに書き出す
-                            CvRect rect = result[i].Value.Rect;
-                            Cv.Rectangle(img, rect, new CvColor(255, 0, 0));
+                            Cv.CvtColor(img, gray_image, ColorConversion.BgrToGray);
 
-                            //矩形部分をファイル出力する
-                            img.ROI = rect;
-                            string out_name = @"out\out" + read_count + @"_"+ i + @".bmp";
-                            Cv.SaveImage(out_name, img);
+                            //発見した矩形
+                            var result = Cv.HaarDetectObjects(gray_image, cascade, strage);
+                            for (int i = 0; i < result.Total; i++)
+                            {
+                                //矩形の大きさに書き出す
+                                CvRect rect = result[i].Value.Rect;
+                                Cv.Rectangle(img, rect, new CvColor(255, 0, 0));
+
+                                //矩形部分をファイル出力する
+                                img.ROI = rect;
+                                string out_name = @"I:\myprog\github\out\out" + read_count + @"_" + i + @".bmp";
+                                Cv.SaveImage(out_name, img);
+                            }
                         }
                     }
                     read_count++;
@@ -87,11 +89,11 @@ namespace makeLearingFile
 
                 if (f_type == FACE_TYPE.FUJIKIN)
                 {
-                    read_list = @"I:\myprog\github\kubokinJudge\data\fujikin\fujikin_list.txt";
+                    read_list = @"I:\myprog\github\data\fujikin\fujikin_list.txt";
                 }
                 else if (f_type == FACE_TYPE.KUBOTA)
                 {
-                    read_list = @"I:\myprog\github\kubokinJudge\data\kubota\kubota_list.txt";
+                    read_list = @"I:\myprog\github\data\kubota\kubota_list.txt";
                 }
 
                 //リストファイルと読みこんでファイル名をとる
