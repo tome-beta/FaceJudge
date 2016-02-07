@@ -89,7 +89,8 @@ namespace MakeSVMFile
                     //基点を作る
                     MakeBasePoint(gray_image);
 
-
+                    tmp_image.Dispose();
+                    gray_image.Dispose();
 
                     read_count++;
                 }
