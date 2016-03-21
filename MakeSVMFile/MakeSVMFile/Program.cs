@@ -82,17 +82,22 @@ namespace MakeSVMFile
 
 
                     //デバッグ用の表示
-                    DebugPrint(tmp_image, read_count);
+//                    DebugPrint(tmp_image, read_count);
 
                     //左眼、右目、鼻、口の矩形を確定させる。
                     DecidePartsRect(gray_image);
 
                     //パーツ確定後
-                    DebugPrint2(gray_image, read_count);
+//                    DebugPrint2(gray_image, read_count);
 
 
+                    PartsRectInfo parts_info;
+                    parts_info.RightEye = this.RightEyeRect;
+                    parts_info.LeftEye = this.LeftEyeRect;
+                    parts_info.Nose = this.NoseRect;
+                    parts_info.Mouth = this.MouthRect;
                     //基点を作る
-                    MakeBasePoint(gray_image);
+                    MakeBasePoint(gray_image,parts_info);
 
 
                     read_count++;
@@ -193,10 +198,34 @@ namespace MakeSVMFile
         /// <summary>
         /// 目と目の間の座標。基点を作る
         /// </summary>
-        private void MakeBasePoint(IplImage img)
+        private bool MakeBasePoint(IplImage img,PartsRectInfo input_info)
         {
+            //パーツがすべてそろっているかの確認
+            if (input_info.RightEye.X == 0)
+            {
+                return false;
+            }
+            if (input_info.LeftEye.X == 0)
+            {
+                return false;
+            }
+            if (input_info.Nose.X == 0)
+            {
+                return false;
+            }
+            if (input_info.Mouth.X == 0)
+            {
+                return false;
+            }
+
             //瞳の間の場所を基点として各パーツとの比率をとる
             //（パーツ座標と基点との距離）/瞳の間の距離を学習データとする
+
+            //右目の中心と左目の中心を結んだ線の中点が基準点。
+
+            //基準点から各パーツの右端、左端までの距離を特徴量とする
+
+            return true;
         }
 
 
@@ -286,6 +315,33 @@ namespace MakeSVMFile
         CvPoint BasePoint;    //目と目の間の座標。基点
 
         CvSeq<CvAvgComp> EyeResult, NoseResult, MouthResult;
+
+        //各パーツの矩形
+        struct PartsRectInfo
+        {
+            public CvRect RightEye;
+            public CvRect LeftEye;
+            public CvRect Nose;
+            public CvRect Mouth;
+        };
+
+        //特徴量
+        struct FeatureValue
+        {
+            CvPoint basepoint;
+            CvPoint LeftEyeL;
+            CvPoint LeftEyeR;
+            CvPoint RightEyeL;
+            CvPoint RightEyeR;
+            CvPoint NoseL;
+            CvPoint NoseR;
+            CvPoint MouthL;
+            CvPoint MouthR;
+
+
+        };
+
+
         CvRect RightEyeRect, LeftEyeRect, NoseRect, MouthRect;        //パーツの座標
     }
 }
