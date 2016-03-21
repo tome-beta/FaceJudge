@@ -51,6 +51,7 @@ namespace MakeSVMFile
             {
                 string input_file_path = this.KubotaList[read_count];
 
+                //リストにあるファイルを一枚づつデータにする
                 using (IplImage img = new IplImage(input_file_path))
                 {
                     IplImage tmp_image;
@@ -76,62 +77,77 @@ namespace MakeSVMFile
                     this.NoseResult = Cv.HaarDetectObjects(gray_image, nose_cascade, strage);
                     this.MouthResult = Cv.HaarDetectObjects(gray_image, mouth_cascade, strage);
 
+                    //初期化
+                    DataInit();
+
+
                     //デバッグ用の表示
-//                    DebugPrint(tmp_image, read_count);
+                    DebugPrint(tmp_image, read_count);
 
                     //左眼、右目、鼻、口の矩形を確定させる。
                     DecidePartsRect(gray_image);
 
                     //パーツ確定後
-                    DebugPrint2(tmp_image, read_count);
+                    DebugPrint2(gray_image, read_count);
 
 
                     //基点を作る
                     MakeBasePoint(gray_image);
 
-                    tmp_image.Dispose();
-                    gray_image.Dispose();
 
                     read_count++;
                 }
             }
         }
 
+        /// <summary>
+        /// パラメータの初期化
+        /// </summary>
+        private void DataInit()
+        {
+            this.LeftEyeRect = new CvRect(0, 0, 0, 0);
+            this.RightEyeRect = new CvRect(0, 0, 0, 0);
+            this.MouthRect = new CvRect(0, 0, 0, 0);
+            this.NoseRect = new CvRect(0, 0, 0, 0);
+
+        }
 
         /// <summary>
         /// パーツの矩形を確定させる
         /// </summary>
         private void DecidePartsRect(IplImage img)
         {
-            this.LeftEyeRect = new CvRect(0, 0, 0, 0);
-            this.RightEyeRect = new CvRect(0, 0, 0, 0);
-            this.NoseRect = new CvRect(0, 0, 0, 0);
-            this.MouthRect = new CvRect(0, 0, 0, 0);
-
-            //矩形の選別に使う
-            int image_half_y = img.Height / 2;
-            int image_half_x = img.Width / 2; 
-
             //両目の矩形を探す　左眼は画像の半分より左で逆は右
+            int image_half_x = img.Width / 2;
+            int image_half_y = img.Height / 2;
             for (int i = 0; i < this.EyeResult.Total; i++)
             {
                 CvRect rect = this.EyeResult[i].Value.Rect;
-                int rect_size = rect.Width * rect.Height;
-                if (rect.X <= image_half_x + 10)
+                int rect_size = rect.Height * rect.Width;
+
+                //右目
+                if (rect.X < image_half_x)
                 {
                     //サイズの大きい矩形を採用
-                    if (LeftEyeRect.Width * LeftEyeRect.Height <= rect_size)
+                    if (this.RightEyeRect.Width * this.RightEyeRect.Height <= rect_size)
                     {
-                        LeftEyeRect = rect;
+                        this.RightEyeRect = rect;
                     }
                 }
+            }
 
-                if (rect.X >= image_half_x - 10)
+            for (int i = 0; i < this.EyeResult.Total; i++)
+            {
+                CvRect rect = this.EyeResult[i].Value.Rect;
+                int rect_size = rect.Height * rect.Width;
+
+                //左目
+                if (rect.X >= image_half_x)
                 {
                     //サイズの大きい矩形を採用
-                    if (RightEyeRect.Width * RightEyeRect.Height <= rect_size)
+                    if (this.LeftEyeRect.Width * this.LeftEyeRect.Height <= rect_size)
                     {
-                        RightEyeRect = rect;
+                        this.LeftEyeRect = rect;
                     }
                 }
             }
@@ -140,44 +156,37 @@ namespace MakeSVMFile
             for (int i = 0; i < this.NoseResult.Total; i++)
             {
                 CvRect rect = this.NoseResult[i].Value.Rect;
-                int rect_size = rect.Width * rect.Height;
+                int rect_size = rect.Height * rect.Width;
 
-                //画像の中央にあるはず
-                if ( !(rect.X <= image_half_x) || !(image_half_x < rect.X + rect.Width))
+                //画像の中央に位置するはず
+                if(rect.X < image_half_x && image_half_x < rect.X + rect.Width)
                 {
-                    continue;
+                    if(rect.Y < image_half_y && image_half_y < rect.Y + rect.Height)
+                    {
+                        //サイズの大きい矩形を採用
+                        if (this.NoseRect.Width * this.NoseRect.Height <= rect_size)
+                        {
+                            this.NoseRect = rect;
+                        }
+                    }
                 }
-
-                if (!(rect.Y <= image_half_y) || !(image_half_y < rect.Y + rect.Height))
-                {
-                    continue;
-                }
-
-
-                //サイズの大きい矩形を採用
-                if (NoseRect.Width * NoseRect.Height <= rect_size)
-                {
-                    NoseRect = rect;
-                }
-
             }
 
             //口の矩形を確定させる。
             for (int i = 0; i < this.MouthResult.Total; i++)
             {
                 CvRect rect = this.MouthResult[i].Value.Rect;
-                int rect_size = rect.Width * rect.Height;
-                
-                //画像の下半分
-                if (rect.Y >=  image_half_y)
+                int rect_size = rect.Height * rect.Width;
+
+                //画像の下半分にあるはず
+                if(image_half_y < rect.Y)
                 {
                     //サイズの大きい矩形を採用
-                    if (MouthRect.Width * MouthRect.Height <= rect_size)
+                    if (this.MouthRect.Width * this.MouthRect.Height <= rect_size)
                     {
-                        MouthRect = rect;
+                        this.MouthRect = rect;
                     }
                 }
-
             }
         }
 
@@ -205,7 +214,7 @@ namespace MakeSVMFile
 
             using (new CvWindow(img))
             {
-                string out_name = @"I:\myprog\github\out\decide_parts" + count + @".jpeg";
+                string out_name = @"out\decide_parts" + count + @".jpeg";
                 Cv.SaveImage(out_name, img);
                 Cv.WaitKey();
             }                           
@@ -245,7 +254,7 @@ namespace MakeSVMFile
 
             using (new CvWindow(img))
             {
-                string out_name = @"I:\myprog\github\out\out" + count + @".jpeg";
+                string out_name = @"out\out" + count + @".jpeg";
                 Cv.SaveImage(out_name, img);
                 Cv.WaitKey();
             }                           
