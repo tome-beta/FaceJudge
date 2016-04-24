@@ -13,30 +13,25 @@ namespace makeLearingFile
         static void Main(string[] args)
         {
             FaceImageManage manage = new FaceImageManage();
-            manage.exec();
+            manage.exec(args[0],args[1]);
         }
 
         class FaceImageManage
         {
-            public enum FACE_TYPE
-            {
-                FUJIKIN,
-                KUBOTA,
-                MARCELO
-            }
-
             //コンストラクタ
             public FaceImageManage()
             {
 
             }
 
-            public void exec()
+            public void exec(String input_list, String folda_name)
             {
+                this.InputListFileName = input_list;
+                this.OutputFoldaName = folda_name;
+
                 //ファイルリストの読み込み
-//                ReadFileListTest(FACE_TYPE.FUJIKIN);
                 //ファイルリストの読み込み
-                ReadFileListTest(FACE_TYPE.KUBOTA);
+                ReadFileListTest();
 
                 //顔部分の切り出し
                 ExtractFace();
@@ -72,7 +67,7 @@ namespace makeLearingFile
 
                                 //矩形部分をファイル出力する
                                 img.ROI = rect;
-                                string out_name = @"I:\myprog\github\out\out" + read_count + @"_" + i + @".bmp";
+                                string out_name = this.OutputFoldaName + @"\out" +  read_count + @"_" + i + @".bmp";
                                 Cv.SaveImage(out_name, img);
                             }
                         }
@@ -83,21 +78,10 @@ namespace makeLearingFile
 
 
             //顔写真リストファイルを読み込み
-            private void ReadFileListTest(FACE_TYPE f_type)
+            private void ReadFileListTest()
             {
-                string read_list = @"";
-
-                if (f_type == FACE_TYPE.FUJIKIN)
-                {
-                    read_list = @"I:\myprog\github\data\fujikin\fujikin_list.txt";
-                }
-                else if (f_type == FACE_TYPE.KUBOTA)
-                {
-                    read_list = @"I:\myprog\github\data\kubota\kubota_list.txt";
-                }
-
                 //リストファイルと読みこんでファイル名をとる
-                using (StreamReader sr = new StreamReader(read_list))
+                using (StreamReader sr = new StreamReader(this.InputListFileName))
                 {
                     //1行づつ読み込む
                     while (sr.Peek() > -1)
@@ -110,6 +94,9 @@ namespace makeLearingFile
             }
 
             List<string> FaceFileList = new List<string>();
+
+            String InputListFileName = @"";
+            String OutputFoldaName = @"";
         }
     }
 }
