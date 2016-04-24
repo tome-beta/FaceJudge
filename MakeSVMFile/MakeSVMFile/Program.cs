@@ -96,8 +96,10 @@ namespace MakeSVMFile
                     parts_info.LeftEye = this.LeftEyeRect;
                     parts_info.Nose = this.NoseRect;
                     parts_info.Mouth = this.MouthRect;
+
+                    FeatureValue feature_value;
                     //基点を作る
-                    MakeBasePoint(gray_image,parts_info);
+                    MakeBasePoint(gray_image, ref parts_info, out feature_value);
 
 
                     read_count++;
@@ -198,8 +200,19 @@ namespace MakeSVMFile
         /// <summary>
         /// 目と目の間の座標。基点を作る
         /// </summary>
-        private bool MakeBasePoint(IplImage img,PartsRectInfo input_info)
+        private bool MakeBasePoint(IplImage img,ref PartsRectInfo input_info,out FeatureValue output_info)
         {
+            //仮に代入
+            output_info.basepoint = new CvPoint(0, 0);
+            output_info.LeftEyeL = new CvPoint(0, 0);
+            output_info.LeftEyeR = new CvPoint(0, 0);
+            output_info.RightEyeL = new CvPoint(0, 0);
+            output_info.RightEyeR = new CvPoint(0, 0);
+            output_info.NoseL = new CvPoint();
+            output_info.NoseR = new CvPoint();
+            output_info.MouthL = new CvPoint();
+            output_info.MouthR = new CvPoint();
+
             //パーツがすべてそろっているかの確認
             if (input_info.RightEye.X == 0)
             {
@@ -220,6 +233,13 @@ namespace MakeSVMFile
 
             //瞳の間の場所を基点として各パーツとの比率をとる
             //（パーツ座標と基点との距離）/瞳の間の距離を学習データとする
+            int LeftEyeCenterX = input_info.LeftEye.X + input_info.LeftEye.Width / 2;
+            int LeftEyeCenterY = input_info.LeftEye.Y + input_info.LeftEye.Height / 2;
+            int RightEyeCenterX = input_info.RightEye.X + input_info.RightEye.Width / 2;
+            int RightEyeCenterY = input_info.RightEye.Y + input_info.RightEye.Height / 2;
+
+            output_info.basepoint.X = LeftEyeCenterX - RightEyeCenterX / 2;
+            output_info.basepoint.Y = LeftEyeCenterY - RightEyeCenterY / 2;
 
             //右目の中心と左目の中心を結んだ線の中点が基準点。
 
@@ -328,17 +348,15 @@ namespace MakeSVMFile
         //特徴量
         struct FeatureValue
         {
-            CvPoint basepoint;
-            CvPoint LeftEyeL;
-            CvPoint LeftEyeR;
-            CvPoint RightEyeL;
-            CvPoint RightEyeR;
-            CvPoint NoseL;
-            CvPoint NoseR;
-            CvPoint MouthL;
-            CvPoint MouthR;
-
-
+            public CvPoint basepoint;
+            public CvPoint LeftEyeL;
+            public CvPoint LeftEyeR;
+            public CvPoint RightEyeL;
+            public CvPoint RightEyeR;
+            public CvPoint NoseL;
+            public CvPoint NoseR;
+            public CvPoint MouthL;
+            public CvPoint MouthR;
         };
 
 
