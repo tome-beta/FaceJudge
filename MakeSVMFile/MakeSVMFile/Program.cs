@@ -13,7 +13,7 @@ namespace MakeSVMFile
         static void Main(string[] args)
         {
             MakeSvmFile svm_make = new MakeSvmFile();
-            svm_make.Exec();
+            svm_make.Exec(args[0],args[1]);
         }
     }
 
@@ -23,8 +23,11 @@ namespace MakeSVMFile
         const int IMAGE_RESIZE_RATE = 4;    //拡大率
 
         
-        public void Exec()
+        public void Exec(String input, String output)
         {
+            this.InputFileList = input;
+            this.OutPutFolda = output;
+
             //学習するファイルを読み込む
             ReadFileList();
 
@@ -214,7 +217,7 @@ namespace MakeSVMFile
 
             using (new CvWindow(img))
             {
-                string out_name = @"out\decide_parts" + count + @".jpeg";
+                string out_name = this.OutPutFolda + @"\decide_parts" + count + @".jpeg";
                 Cv.SaveImage(out_name, img);
                 Cv.WaitKey();
             }                           
@@ -254,7 +257,7 @@ namespace MakeSVMFile
 
             using (new CvWindow(img))
             {
-                string out_name = @"out\out" + count + @".jpeg";
+                string out_name = this.OutPutFolda + @"\out" + count + @".jpeg";
                 Cv.SaveImage(out_name, img);
                 Cv.WaitKey();
             }                           
@@ -266,8 +269,7 @@ namespace MakeSVMFile
         private void ReadFileList()
         {
             string read_list = @"";
-//            read_list = @"I:\myprog\github\kubokinJudge\data\kubota_face\kubota_face_list.txt";
-            read_list = @"I:\myprog\github\data\fujikin_face\fujikin_face_list.txt";
+            read_list = this.InputFileList;
             //リストファイルと読みこんでファイル名をとる
             using (StreamReader sr = new StreamReader(read_list))
             {
@@ -287,5 +289,9 @@ namespace MakeSVMFile
 
         CvSeq<CvAvgComp> EyeResult, NoseResult, MouthResult;
         CvRect RightEyeRect, LeftEyeRect, NoseRect, MouthRect;        //パーツの座標
+
+        String InputFileList = @"";
+        String OutPutFolda = @"";
+
     }
 }
