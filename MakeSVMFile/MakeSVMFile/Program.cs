@@ -267,16 +267,48 @@ namespace MakeSVMFile
             int RightEyeCenterY = input_info.RightEye.Y + input_info.RightEye.Height / 2;
 
             //右目の中心と左目の中心を結んだ線の中点が基準点。
-            output_info.basepoint.X = LeftEyeCenterX - RightEyeCenterX / 2;
-            output_info.basepoint.Y = LeftEyeCenterY - RightEyeCenterY / 2;
+            output_info.basepoint.X = LeftEyeCenterX + RightEyeCenterX / 2;
+            output_info.basepoint.Y = LeftEyeCenterY + RightEyeCenterY / 2;
 
             //目と目の距離をとる
-            output_info.BothEyeDistance = System.Math.Pow((LeftEyeCenterX - RightEyeCenterX), 2) -
-                                        System.Math.Pow((LeftEyeCenterY - RightEyeCenterY), 2);
-            output_info.BothEyeDistance = System.Math.Sqrt(output_info.BothEyeDistance);
-
+            output_info.BothEyeDistance = makeTwoPointDistance(LeftEyeCenterX, RightEyeCenterX, LeftEyeCenterY, RightEyeCenterY);
             //基準点から各パーツの右端、左端までの距離をとる
-//            output_info.LeftEyeValuie = 
+            output_info.LeftEyeValuieL = makeTwoPointDistance(input_info.LeftEye.X, 
+                                                              output_info.basepoint.X,
+                                                              input_info.LeftEye.Y,
+                                                              output_info.basepoint.Y);
+            output_info.LeftEyeValuieR = makeTwoPointDistance(input_info.LeftEye.X + input_info.LeftEye.Width,
+                                                              output_info.basepoint.X,
+                                                              input_info.LeftEye.Y,
+                                                              output_info.basepoint.Y);
+
+            output_info.RightEyeValuieL = makeTwoPointDistance(input_info.RightEye.X,
+                                                              output_info.basepoint.X,
+                                                              input_info.RightEye.Y,
+                                                              output_info.basepoint.Y);
+            output_info.RightEyeValuieR = makeTwoPointDistance(input_info.RightEye.X + input_info.RightEye.Width,
+                                                              output_info.basepoint.X,
+                                                              input_info.RightEye.Y,
+                                                              output_info.basepoint.Y);
+
+            output_info.NoseLValuieL = makeTwoPointDistance(input_info.Nose.X,
+                                                  output_info.basepoint.X,
+                                                  input_info.Nose.Y,
+                                                  output_info.basepoint.Y);
+            output_info.NoseLValuieR = makeTwoPointDistance(input_info.Nose.X + input_info.Nose.Width,
+                                                              output_info.basepoint.X,
+                                                              input_info.Nose.Y,
+                                                              output_info.basepoint.Y);
+
+            output_info.MouthLValuieL = makeTwoPointDistance(input_info.Mouth.X,
+                                                  output_info.basepoint.X,
+                                                  input_info.Mouth.Y,
+                                                  output_info.basepoint.Y);
+            output_info.MouthLValuieR = makeTwoPointDistance(input_info.Mouth.X + input_info.Mouth.Width,
+                                                              output_info.basepoint.X,
+                                                              input_info.Mouth.Y,
+                                                              output_info.basepoint.Y);
+
 
             //基準点からパーツまでの距離と瞳間距離の比率を特徴量とする
 
