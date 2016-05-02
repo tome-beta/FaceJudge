@@ -22,6 +22,30 @@ namespace MakeSVMFile
         const int SMALL_IMAGE_LIMIT = 100;  //顔画像を拡大対象にする
         const int IMAGE_RESIZE_RATE = 4;    //拡大率
 
+        //各パーツの矩形
+        struct PartsRectInfo
+        {
+            public CvRect RightEye;
+            public CvRect LeftEye;
+            public CvRect Nose;
+            public CvRect Mouth;
+        };
+
+        //特徴量
+        struct FeatureValue
+        {
+            public CvPoint basepoint;   //両目の間の基点
+            public double BothEyeDistance; //目と目の間の距離
+            public double LeftEyeValuieL;
+            public double LeftEyeValuieR;
+            public double RightEyeValuieL;
+            public double RightEyeValuieR;
+            public double NoseLValuieL;
+            public double NoseLValuieR;
+            public double MouthLValuieL;
+            public double MouthLValuieR;
+        };
+
         
         public void Exec(String input, String output)
         {
@@ -100,7 +124,7 @@ namespace MakeSVMFile
                     parts_info.Nose = this.NoseRect;
                     parts_info.Mouth = this.MouthRect;
 
-                    FeatureValue feature_value;
+                    FeatureValue feature_value =  new FeatureValue();
                     //基点を作る
                     MakeBasePoint(gray_image, ref parts_info, out feature_value);
 
@@ -205,16 +229,17 @@ namespace MakeSVMFile
         /// </summary>
         private bool MakeBasePoint(IplImage img,ref PartsRectInfo input_info,out FeatureValue output_info)
         {
-            //仮に代入
+            //仮に代入  
             output_info.basepoint = new CvPoint(0, 0);
-            output_info.LeftEyeL = new CvPoint(0, 0);
-            output_info.LeftEyeR = new CvPoint(0, 0);
-            output_info.RightEyeL = new CvPoint(0, 0);
-            output_info.RightEyeR = new CvPoint(0, 0);
-            output_info.NoseL = new CvPoint();
-            output_info.NoseR = new CvPoint();
-            output_info.MouthL = new CvPoint();
-            output_info.MouthR = new CvPoint();
+            output_info.BothEyeDistance = 0;
+            output_info.LeftEyeValuieL = 0;
+            output_info.LeftEyeValuieR = 0;
+            output_info.RightEyeValuieL = 0;
+            output_info.RightEyeValuieR = 0;
+            output_info.NoseLValuieL = 0;
+            output_info.NoseLValuieR = 0;
+            output_info.MouthLValuieL = 0;
+            output_info.MouthLValuieR = 0;
 
             //パーツがすべてそろっているかの確認
             if (input_info.RightEye.X == 0)
@@ -241,16 +266,36 @@ namespace MakeSVMFile
             int RightEyeCenterX = input_info.RightEye.X + input_info.RightEye.Width / 2;
             int RightEyeCenterY = input_info.RightEye.Y + input_info.RightEye.Height / 2;
 
+            //右目の中心と左目の中心を結んだ線の中点が基準点。
             output_info.basepoint.X = LeftEyeCenterX - RightEyeCenterX / 2;
             output_info.basepoint.Y = LeftEyeCenterY - RightEyeCenterY / 2;
 
-            //右目の中心と左目の中心を結んだ線の中点が基準点。
+            //目と目の距離をとる
+            output_info.BothEyeDistance = System.Math.Pow((LeftEyeCenterX - RightEyeCenterX), 2) -
+                                        System.Math.Pow((LeftEyeCenterY - RightEyeCenterY), 2);
+            output_info.BothEyeDistance = System.Math.Sqrt(output_info.BothEyeDistance);
 
-            //基準点から各パーツの右端、左端までの距離を特徴量とする
+            //基準点から各パーツの右端、左端までの距離をとる
+//            output_info.LeftEyeValuie = 
+
+            //基準点からパーツまでの距離と瞳間距離の比率を特徴量とする
 
             return true;
         }
 
+        /// <summary>
+        /// ２点間の距離を出す
+        /// </summary>
+        /// <returns></returns>
+        private double makeTwoPointDistance(int x1,int y1, int x2 ,int y2)
+        {
+            double answer = 0;
+
+            answer = Math.Pow(x2- x1,2) -Math.Pow(y2-y1,2);
+            answer = Math.Sqrt(answer);
+
+            return answer;
+        }
 
         private void DebugPrint2(IplImage img, int count)
         {
@@ -333,34 +378,7 @@ namespace MakeSVMFile
         }
 
         List<string> KubotaList = new List<string>();
-
-        CvPoint BasePoint;    //目と目の間の座標。基点
-
         CvSeq<CvAvgComp> EyeResult, NoseResult, MouthResult;
-
-        //各パーツの矩形
-        struct PartsRectInfo
-        {
-            public CvRect RightEye;
-            public CvRect LeftEye;
-            public CvRect Nose;
-            public CvRect Mouth;
-        };
-
-        //特徴量
-        struct FeatureValue
-        {
-            public CvPoint basepoint;
-            public CvPoint LeftEyeL;
-            public CvPoint LeftEyeR;
-            public CvPoint RightEyeL;
-            public CvPoint RightEyeR;
-            public CvPoint NoseL;
-            public CvPoint NoseR;
-            public CvPoint MouthL;
-            public CvPoint MouthR;
-        };
-
 
         CvRect RightEyeRect, LeftEyeRect, NoseRect, MouthRect;        //パーツの座標
 
