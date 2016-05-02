@@ -16,13 +16,19 @@ namespace MakeSVMFile
             //8個のfloat * LISTの大きさの配列
             double[] feature_array = new double[8 * FeatureList.Count];
 
+            //特徴量をSVMで扱えるように配列に置き換える
             SetFeatureToArray(FeatureList,ref feature_array);
-
             //入力データ
-            //CvMat dataMat = new CvMat(FeatureList.Count, 8, MatrixType.F32C1, FeatureList, true);
+            CvMat dataMat = new CvMat(feature_array.Length /8, 8, MatrixType.F32C1, feature_array, true);
 
+            int[] id_array = new int[IDList.Count];
+
+            for(int i = 0; i < id_array.Length;i++)
+            {
+                id_array[i] = IDList[i];
+            }
             //これがラベル番号
-//            CvMat resMat = new CvMat(responses.Length, 1, MatrixType.S32C1, responses, true);
+            CvMat resMat = new CvMat(id_array.Length, 1, MatrixType.S32C1, id_array, true);
 
             //正規化する0～１．０に収まるようにする
             //全部２で割る？最大値がだいたい１．６くらいのはずなので
