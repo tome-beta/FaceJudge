@@ -13,7 +13,7 @@ namespace MakeSVMFile
         static void Main(string[] args)
         {
             MakeSvmFile svm_make = new MakeSvmFile();
-            svm_make.Exec(args[0],args[1]);
+            svm_make.Exec(args[0],args[1],args[2]);
         }
     }
 
@@ -47,10 +47,11 @@ namespace MakeSVMFile
         };
 
         
-        public void Exec(String input, String output)
+        public void Exec(String input, String output, String label_id)
         {
             this.InputFileList = input;
             this.OutPutFolda = output;
+            this.SVMLabelID = int.Parse(label_id);
 
             //学習するファイルを読み込む
             ReadFileList();
@@ -337,6 +338,11 @@ namespace MakeSVMFile
             return answer;
         }
 
+        /// <summary>
+        /// 矩形選択後の画像を表示
+        /// </summary>
+        /// <param name="img"></param>
+        /// <param name="count"></param>
         private void DebugPrint2(IplImage img, int count)
         {
             //目の結果
@@ -425,5 +431,6 @@ namespace MakeSVMFile
         String InputFileList = @"";
         String OutPutFolda = @"";
 
+        int SVMLabelID = -1;
     }
 }
