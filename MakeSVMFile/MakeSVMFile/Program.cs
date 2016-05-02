@@ -125,8 +125,8 @@ namespace MakeSVMFile
                     parts_info.Mouth = this.MouthRect;
 
                     FeatureValue feature_value =  new FeatureValue();
-                    //基点を作る
-                    MakeBasePoint(gray_image, ref parts_info, out feature_value);
+                    //特徴量を作る
+                    MakeFeatureValue(gray_image, ref parts_info, out feature_value);
 
 
                     read_count++;
@@ -225,9 +225,9 @@ namespace MakeSVMFile
         }
 
         /// <summary>
-        /// 目と目の間の座標。基点を作る
+        /// 特徴量をだす
         /// </summary>
-        private bool MakeBasePoint(IplImage img,ref PartsRectInfo input_info,out FeatureValue output_info)
+        private bool MakeFeatureValue(IplImage img,ref PartsRectInfo input_info,out FeatureValue output_info)
         {
             //仮に代入  
             output_info.basepoint = new CvPoint(0, 0);
@@ -311,6 +311,14 @@ namespace MakeSVMFile
 
 
             //基準点からパーツまでの距離と瞳間距離の比率を特徴量とする
+            output_info.LeftEyeValuieL /= output_info.BothEyeDistance;
+            output_info.LeftEyeValuieR /= output_info.BothEyeDistance;
+            output_info.RightEyeValuieL /= output_info.BothEyeDistance;
+            output_info.RightEyeValuieR /= output_info.BothEyeDistance;
+            output_info.NoseLValuieL /= output_info.BothEyeDistance;
+            output_info.NoseLValuieR /= output_info.BothEyeDistance;
+            output_info.MouthLValuieL /= output_info.BothEyeDistance;
+            output_info.MouthLValuieR /= output_info.BothEyeDistance;
 
             return true;
         }
@@ -323,7 +331,7 @@ namespace MakeSVMFile
         {
             double answer = 0;
 
-            answer = Math.Pow(x2- x1,2) -Math.Pow(y2-y1,2);
+            answer = Math.Pow(x2- x1,2) + Math.Pow(y2-y1,2);
             answer = Math.Sqrt(answer);
 
             return answer;
