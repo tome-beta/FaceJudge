@@ -60,8 +60,12 @@ namespace MakeSVMFile
             DetectFacePoint();
 
             //学習実行
-            SvmLearning svm = new SvmLearning();
-            svm.Exec(this.FeatuerValueList,this.FeatureIDList);
+            SvmLearning svm_learning = new SvmLearning();
+            svm_learning.Exec(this.FeatuerValueList, this.FeatureIDList);
+
+            //学習ファイルをxmlに書き出す
+            String xml_name = @"SvmLearning.xml";
+            svm_learning.svm.Save(xml_name);
         }
 
         //画像ファイルから特徴点をだす

@@ -27,28 +27,34 @@ namespace MakeSVMFile
             {
                 id_array[i] = IDList[i];
             }
+            //test 
+            id_array[0] = 2;
+
             //これがラベル番号
             CvMat resMat = new CvMat(id_array.Length, 1, MatrixType.S32C1, id_array, true);
 
             //正規化する0～１．０に収まるようにする
             //全部２で割る？最大値がだいたい１．６くらいのはずなので
+            dataMat /= 2.0;
 
             //SVMの用意
             CvTermCriteria criteria = new CvTermCriteria(1000, 0.000001);
             CvSVMParams param = new CvSVMParams(
                 SVMType.CSvc,
                 SVMKernelType.Rbf,
-                100.0,  // degree
-                100.0,  // gamma        調整
+                10.0,  // degree
+                8.0,  // gamma        調整
                 1.0, // coeff0
-                1.0, // c               調整
+                10.0, // c               調整
                 0.5, // nu
                 0.1, // p
                 null,
                 criteria);
 
             //学習実行
-//            svm.Train(dataMat, resMat, null, null, param);
+            svm = new CvSVM();
+            svm.Train(dataMat, resMat, null, null, param);
+
         }
 
         /// <summary>
@@ -72,5 +78,6 @@ namespace MakeSVMFile
                 value_array[idx++] = (FeatureList[i].MouthLValuieR);
             }
         }
+        public CvSVM svm { get; set; }
     }
 }
