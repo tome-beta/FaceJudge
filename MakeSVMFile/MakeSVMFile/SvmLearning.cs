@@ -27,8 +27,6 @@ namespace MakeSVMFile
             {
                 id_array[i] = IDList[i];
             }
-            //test 
-            id_array[0] = 2;
 
             //これがラベル番号
             CvMat resMat = new CvMat(id_array.Length, 1, MatrixType.S32C1, id_array, true);

@@ -13,7 +13,7 @@ namespace MakeSVMFile
         static void Main(string[] args)
         {
             MakeSvmFile svm_make = new MakeSvmFile();
-            svm_make.Exec(args[0],args[1],args[2]);
+            svm_make.Exec(args[0],args[1]);
         }
     }
 
@@ -47,11 +47,11 @@ namespace MakeSVMFile
         };
 
         
-        public void Exec(String input, String output, String label_id)
+        public void Exec(String input, String output)
         {
             this.InputFileList = input;
             this.OutPutFolda = output;
-            this.SVMLabelID = int.Parse(label_id);
+//            this.SVMLabelID = int.Parse(label_id);
 
             //学習するファイルを読み込む
             ReadFileList();
@@ -82,9 +82,9 @@ namespace MakeSVMFile
 
 
             int read_count = 0;
-            while (read_count < this.KubotaList.Count())
+            while (read_count < this.FaceList.Count())
             {
-                string input_file_path = this.KubotaList[read_count];
+                string input_file_path = this.FaceList[read_count];
 
                 //リストにあるファイルを一枚づつデータにする
                 using (IplImage img = new IplImage(input_file_path))
@@ -140,7 +140,7 @@ namespace MakeSVMFile
                     if (ret)
                     {
                         this.FeatuerValueList.Add(feature_value);
-                        this.FeatureIDList.Add(this.SVMLabelID);// TODO
+                        this.FeatureIDList.Add(this.IDList[read_count]);
                     }
                     read_count++;
                 }
@@ -428,14 +428,19 @@ namespace MakeSVMFile
                 //1行づつ読み込む
                 while (sr.Peek() > -1)
                 {
-                    this.KubotaList.Add(sr.ReadLine());
+                    // カンマ区切りで分割して配列に格納する
+                    string[] stArrayData = sr.ReadLine().Split(',');
+
+                    this.FaceList.Add(stArrayData[0]);
+                    this.IDList.Add(int.Parse(stArrayData[1]));
                 }
                 //閉じる
                 sr.Close();
             }
         }
 
-        List<string> KubotaList = new List<string>();
+        List<string> FaceList = new List<string>();
+        List<int> IDList = new List<int>();//特徴量とセットで使うID
         CvSeq<CvAvgComp> EyeResult, NoseResult, MouthResult;
 
         CvRect RightEyeRect, LeftEyeRect, NoseRect, MouthRect;        //パーツの座標
@@ -443,7 +448,6 @@ namespace MakeSVMFile
         String InputFileList = @"";
         String OutPutFolda = @"";
 
-        int SVMLabelID = -1;
         List<FeatureValue> FeatuerValueList = new List<FeatureValue>(); //特徴量のLIST
         List<int> FeatureIDList = new List<int>();//特徴量とセットで使うID
     }
