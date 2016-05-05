@@ -34,6 +34,7 @@ namespace MakeSVMFile
         //特徴量
         public struct FeatureValue
         {
+            public int ID;              //種類分け用のID
             public CvPoint basepoint;   //両目の間の基点
             public double BothEyeDistance; //目と目の間の距離
             public double LeftEyeValuieL;
@@ -61,7 +62,7 @@ namespace MakeSVMFile
 
             //学習実行
             SvmLearning svm_learning = new SvmLearning();
-            svm_learning.Exec(this.FeatuerValueList, this.FeatureIDList);
+            svm_learning.Exec(this.FeatuerValueList);
 
             //学習ファイルをxmlに書き出す
             String xml_name = @"SvmLearning.xml";
@@ -139,8 +140,8 @@ namespace MakeSVMFile
                     //正しいデータを登録
                     if (ret)
                     {
+                        feature_value.ID = this.IDList[read_count];
                         this.FeatuerValueList.Add(feature_value);
-                        this.FeatureIDList.Add(this.IDList[read_count]);
                     }
                     read_count++;
                 }
@@ -253,6 +254,7 @@ namespace MakeSVMFile
             output_info.NoseLValuieR = 0;
             output_info.MouthLValuieL = 0;
             output_info.MouthLValuieR = 0;
+            output_info.ID = 0;
 
             //パーツがすべてそろっているかの確認
             if (input_info.RightEye.X == 0)
@@ -449,6 +451,5 @@ namespace MakeSVMFile
         String OutPutFolda = @"";
 
         List<FeatureValue> FeatuerValueList = new List<FeatureValue>(); //特徴量のLIST
-        List<int> FeatureIDList = new List<int>();//特徴量とセットで使うID
     }
 }

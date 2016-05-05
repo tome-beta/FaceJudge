@@ -10,7 +10,7 @@ namespace MakeSVMFile
 {
     class SvmLearning
     {
-        public void Exec(List<MakeSvmFile.FeatureValue>FeatureList, List<int>IDList)
+        public void Exec(List<MakeSvmFile.FeatureValue>FeatureList)
         {
             //特徴量をMatに移し替える　８個で一つ
             //8個のfloat * LISTの大きさの配列
@@ -19,13 +19,13 @@ namespace MakeSVMFile
             //特徴量をSVMで扱えるように配列に置き換える
             SetFeatureToArray(FeatureList,ref feature_array);
             //入力データ
-            CvMat dataMat = new CvMat(feature_array.Length /8, 8, MatrixType.F32C1, feature_array, true);
+            CvMat dataMat = new CvMat(feature_array.Length / 8, 8, MatrixType.F32C1, feature_array, true);
 
-            int[] id_array = new int[IDList.Count];
+            int[] id_array = new int[FeatureList.Count];
 
             for(int i = 0; i < id_array.Length;i++)
             {
-                id_array[i] = IDList[i];
+                id_array[i] = FeatureList[i].ID;
             }
 
             //これがラベル番号
@@ -52,6 +52,11 @@ namespace MakeSVMFile
             //学習実行
             svm = new CvSVM();
             svm.Train(dataMat, resMat, null, null, param);
+
+        }
+
+        private void MakeFeature()
+        {
 
         }
 
