@@ -48,6 +48,23 @@ namespace MakeSVMFile
         //特徴量の算出
         public void DetectFacePoint()
         {
+            int read_count = 0;
+            while (read_count < this.FaceList.Count())
+            {
+                string input_file_path = this.FaceList[read_count];
+                int face_id = this.IDList[read_count];
+                MakeFeatureFromFile(input_file_path,face_id);
+
+                read_count++;
+            }
+        }
+
+        /// <summary>
+        /// ファイル名から特徴量を出す処理
+        /// </summary>
+        /// <param name="file_name"></param>
+        private void MakeFeatureFromFile(String file_name,int face_id)
+        {
             string eye_cascade_xml = @"C:\opencv2.4.8\sources\data\haarcascades\haarcascade_eye.xml";
             string nose_cascade_xml = @"C:\opencv2.4.8\sources\data\haarcascades\haarcascade_mcs_nose.xml";
             string mouth_cascade_xml = @"C:\opencv2.4.8\sources\data\haarcascades\haarcascade_mcs_mouth.xml";
@@ -57,72 +74,65 @@ namespace MakeSVMFile
             CvHaarClassifierCascade nose_cascade = CvHaarClassifierCascade.FromFile(nose_cascade_xml);
             CvHaarClassifierCascade mouth_cascade = CvHaarClassifierCascade.FromFile(mouth_cascade_xml);
 
-
-            int read_count = 0;
-            while (read_count < this.FaceList.Count())
+            //リストにあるファイルを一枚づつデータにする
+            using (IplImage img = new IplImage(file_name))
             {
-                string input_file_path = this.FaceList[read_count];
-
-                //リストにあるファイルを一枚づつデータにする
-                using (IplImage img = new IplImage(input_file_path))
+                IplImage tmp_image;
+                //サイズが小さければ拡大して使う
+                if (img.Size.Width < SMALL_IMAGE_LIMIT)
                 {
-                    IplImage tmp_image;
-                    //サイズが小さければ拡大して使う
-                    if (img.Size.Width < SMALL_IMAGE_LIMIT)
-                    {
-                        tmp_image = Cv.CreateImage(new CvSize(img.Width * IMAGE_RESIZE_RATE, img.Height * IMAGE_RESIZE_RATE), BitDepth.U8, 3);
-                        Cv.Resize(img, tmp_image);
-                    }
-                    else
-                    {
-                        tmp_image = Cv.CreateImage(new CvSize(img.Width, img.Height), BitDepth.U8, 3);
-                        Cv.Resize(img, tmp_image);
-                    }
+                    tmp_image = Cv.CreateImage(new CvSize(img.Width * IMAGE_RESIZE_RATE, img.Height * IMAGE_RESIZE_RATE), BitDepth.U8, 3);
+                    Cv.Resize(img, tmp_image);
+                }
+                else
+                {
+                    tmp_image = Cv.CreateImage(new CvSize(img.Width, img.Height), BitDepth.U8, 3);
+                    Cv.Resize(img, tmp_image);
+                }
 
-                    //グレースケールに変換
-                    IplImage gray_image = Cv.CreateImage(new CvSize(tmp_image.Width, tmp_image.Height), BitDepth.U8, 1);
-                    Cv.CvtColor(tmp_image, gray_image, ColorConversion.BgrToGray);
+                //グレースケールに変換
+                IplImage gray_image = Cv.CreateImage(new CvSize(tmp_image.Width, tmp_image.Height), BitDepth.U8, 1);
+                Cv.CvtColor(tmp_image, gray_image, ColorConversion.BgrToGray);
 
-                    //発見した矩形
-                    //TODO まゆの位置も有る方がいいかも
-                    this.EyeResult = Cv.HaarDetectObjects(gray_image, eye_cascade, strage);
-                    this.NoseResult = Cv.HaarDetectObjects(gray_image, nose_cascade, strage);
-                    this.MouthResult = Cv.HaarDetectObjects(gray_image, mouth_cascade, strage);
+                //発見した矩形
+                this.EyeResult = Cv.HaarDetectObjects(gray_image, eye_cascade, strage);
+                this.NoseResult = Cv.HaarDetectObjects(gray_image, nose_cascade, strage);
+                this.MouthResult = Cv.HaarDetectObjects(gray_image, mouth_cascade, strage);
 
-                    //初期化
-                    DataInit();
+                //初期化
+                DataInit();
 
 
-                    //デバッグ用の表示
-                    //                    DebugPrint(tmp_image, read_count);
+                //デバッグ用の表示
+                //                    DebugPrint(tmp_image, read_count);
 
-                    //左眼、右目、鼻、口の矩形を確定させる。
-                    DecidePartsRect(gray_image);
+                //左眼、右目、鼻、口の矩形を確定させる。
+                DecidePartsRect(gray_image);
 
-                    //パーツ確定後
-                    //                    DebugPrint2(gray_image, read_count);
+                //パーツ確定後
+                //                    DebugPrint2(gray_image, read_count);
 
 
-                    PartsRectInfo parts_info;
-                    parts_info.RightEye = this.RightEyeRect;
-                    parts_info.LeftEye = this.LeftEyeRect;
-                    parts_info.Nose = this.NoseRect;
-                    parts_info.Mouth = this.MouthRect;
+                PartsRectInfo parts_info;
+                parts_info.RightEye = this.RightEyeRect;
+                parts_info.LeftEye = this.LeftEyeRect;
+                parts_info.Nose = this.NoseRect;
+                parts_info.Mouth = this.MouthRect;
 
-                    FeatureValue feature_value = new FeatureValue();
-                    //特徴量を作る
-                    bool ret = MakeFeatureValue(gray_image, ref parts_info, out feature_value);
+                FeatureValue feature_value = new FeatureValue();
+                //特徴量を作る
+                bool ret = MakeFeatureValue(gray_image, ref parts_info, out feature_value);
 
-                    //正しいデータを登録
-                    if (ret)
-                    {
-                        feature_value.ID = this.IDList[read_count];
-                        this.FeatuerValueList.Add(feature_value);
-                    }
-                    read_count++;
+                //正しいデータを登録
+                if (ret)
+                {
+                    feature_value.ID = face_id;
+                    this.FeatuerValueList.Add(feature_value);
                 }
             }
         }
+
+
         /// <summary>
         /// 特徴量をだす
         /// </summary>
