@@ -8,9 +8,9 @@ using OpenCvSharp.CPlusPlus;
 
 namespace MakeSVMFile
 {
-    class SvmLearning
+    class SvmManage
     {
-        public void Exec(List<MakeSvmFile.FeatureValue>FeatureList)
+        public void Exec(List<FaceFeature.FeatureValue> FeatureList)
         {
             //特徴量をMatに移し替える　８個で一つ
             //8個のfloat * LISTの大きさの配列
@@ -65,7 +65,7 @@ namespace MakeSVMFile
         /// </summary>
         /// <param name="FeatureList"></param>
         /// <param name="id_list"></param>
-        private void SetFeatureToArray(List<MakeSvmFile.FeatureValue> FeatureList, ref double[] value_array)
+        private void SetFeatureToArray(List<FaceFeature.FeatureValue> FeatureList, ref double[] value_array)
         {
             int idx = 0;
 
