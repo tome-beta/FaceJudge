@@ -37,12 +37,14 @@ namespace MakeSVMFile
 
 
             //学習実行
-            SvmManage svm_manage = new SvmManage();
-            svm_manage.Exec(face_feature.FeatuerValueList);
+            SVMManage svm_manage = new SVMManage();
+            svm_manage.LearningExec(face_feature.FeatuerValueList);
 
             //学習ファイルをxmlに書き出す
             String xml_name = @"SvmLearning.xml";
             svm_manage.svm.Save(xml_name);
+
+            
         }
 
         //顔写真リストファイルを読み込み

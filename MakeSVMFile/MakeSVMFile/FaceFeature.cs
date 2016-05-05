@@ -101,8 +101,6 @@ namespace MakeSVMFile
 
                 //初期化
                 DataInit();
-
-
                 //デバッグ用の表示
                 //                    DebugPrint(tmp_image, read_count);
 
@@ -112,15 +110,14 @@ namespace MakeSVMFile
                 //パーツ確定後
                 //                    DebugPrint2(gray_image, read_count);
 
-
                 PartsRectInfo parts_info;
                 parts_info.RightEye = this.RightEyeRect;
                 parts_info.LeftEye = this.LeftEyeRect;
                 parts_info.Nose = this.NoseRect;
                 parts_info.Mouth = this.MouthRect;
 
-                FeatureValue feature_value = new FeatureValue();
                 //特徴量を作る
+                FeatureValue feature_value = new FeatureValue();
                 bool ret = MakeFeatureValue(gray_image, ref parts_info, out feature_value);
 
                 //正しいデータを登録

@@ -8,9 +8,15 @@ using OpenCvSharp.CPlusPlus;
 
 namespace MakeSVMFile
 {
-    class SvmManage
+    class SVMManage
     {
-        public void Exec(List<FaceFeature.FeatureValue> FeatureList)
+        public SVMManage()
+        {
+              this.svm = new CvSVM();
+        }
+
+        //学習ファイルの作成
+        public void LearningExec(List<FaceFeature.FeatureValue> FeatureList)
         {
             //特徴量をMatに移し替える　８個で一つ
             //8個のfloat * LISTの大きさの配列
@@ -18,17 +24,14 @@ namespace MakeSVMFile
 
             //特徴量をSVMで扱えるように配列に置き換える
             SetFeatureToArray(FeatureList,ref feature_array);
-            //入力データ
             CvMat dataMat = new CvMat(feature_array.Length / 8, 8, MatrixType.F32C1, feature_array, true);
 
+            //これがラベル番号
             int[] id_array = new int[FeatureList.Count];
-
             for(int i = 0; i < id_array.Length;i++)
             {
                 id_array[i] = FeatureList[i].ID;
             }
-
-            //これがラベル番号
             CvMat resMat = new CvMat(id_array.Length, 1, MatrixType.S32C1, id_array, true);
 
             //正規化する0～１．０に収まるようにする
@@ -50,10 +53,18 @@ namespace MakeSVMFile
                 criteria);
 
             //学習実行
-            svm = new CvSVM();
+
             svm.Train(dataMat, resMat, null, null, param);
 
         }
+
+        //SVM判定
+        public void SVMJudge()
+        {
+            //学習ファイルを読み込む
+            svm.Load(@"SvmLearning.xml");
+        }
+
 
         private void MakeFeature()
         {

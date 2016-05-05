@@ -63,7 +63,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="FaceFeature.cs" />
-    <Compile Include="SvmLearning.cs" />
+    <Compile Include="SVMMage.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
