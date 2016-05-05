@@ -43,7 +43,7 @@ namespace MakeSVMFile
             //学習ファイルをxmlに書き出す
             String xml_name = @"SvmLearning.xml";
             svm_manage.svm.Save(xml_name);
-
+//            svm_manage.SVMJudge();
             
         }
 
