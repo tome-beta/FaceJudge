@@ -8,27 +8,30 @@ using OpenCvSharp.CPlusPlus;
 
 namespace MakeSVMFile
 {
-    class SvmLearning
+    class SVMManage
     {
-        public void Exec(List<MakeSvmFile.FeatureValue>FeatureList, List<int>IDList)
+        public SVMManage()
+        {
+          this.svm = new CvSVM();
+        }
+
+        //学習ファイルの作成
+        public void LearningExec(List<FaceFeature.FeatureValue> FeatureList)
         {
             //特徴量をMatに移し替える　８個で一つ
             //8個のfloat * LISTの大きさの配列
             double[] feature_array = new double[8 * FeatureList.Count];
 
             //特徴量をSVMで扱えるように配列に置き換える
-            SetFeatureToArray(FeatureList,ref feature_array);
-            //入力データ
-            CvMat dataMat = new CvMat(feature_array.Length /8, 8, MatrixType.F32C1, feature_array, true);
-
-            int[] id_array = new int[IDList.Count];
-
-            for(int i = 0; i < id_array.Length;i++)
-            {
-                id_array[i] = IDList[i];
-            }
+            SetFeatureListToArray(FeatureList,ref feature_array);
+            CvMat dataMat = new CvMat(feature_array.Length / 8, 8, MatrixType.F32C1, feature_array, true);
 
             //これがラベル番号
+            int[] id_array = new int[FeatureList.Count];
+            for(int i = 0; i < id_array.Length;i++)
+            {
+                id_array[i] = FeatureList[i].ID;
+            }
             CvMat resMat = new CvMat(id_array.Length, 1, MatrixType.S32C1, id_array, true);
 
             //正規化する0～１．０に収まるようにする
@@ -50,8 +53,27 @@ namespace MakeSVMFile
                 criteria);
 
             //学習実行
-            svm = new CvSVM();
             svm.Train(dataMat, resMat, null, null, param);
+
+        }
+
+        //SVM判定
+        public void SVMPredict(FaceFeature.FeatureValue feature)
+        {
+            double[] feature_array = new double[8];
+            SetFeatureToArray(feature, ref feature_array);
+            CvMat dataMat = new CvMat(1, 8, MatrixType.F32C1, feature_array, true);
+
+            //学習ファイルを読み込む
+            svm.Load(@"SvmLearning.xml");
+
+//            bool ret = false;
+            float result = this.svm.Predict(dataMat);
+        }
+
+
+        private void MakeFeature()
+        {
 
         }
 
@@ -60,7 +82,7 @@ namespace MakeSVMFile
         /// </summary>
         /// <param name="FeatureList"></param>
         /// <param name="id_list"></param>
-        private void SetFeatureToArray(List<MakeSvmFile.FeatureValue> FeatureList, ref double[] value_array)
+        private void SetFeatureListToArray(List<FaceFeature.FeatureValue> FeatureList, ref double[] value_array)
         {
             int idx = 0;
 
@@ -75,6 +97,24 @@ namespace MakeSVMFile
                 value_array[idx++] = (FeatureList[i].MouthLValuieL);
                 value_array[idx++] = (FeatureList[i].MouthLValuieR);
             }
+        }
+
+        /// <summary>
+        /// 単体の特徴量構造体を配列に直す　　要検討
+        /// </summary>
+        /// <param name="feature"></param>
+        /// <param name="value_array"></param>
+        private void SetFeatureToArray(FaceFeature.FeatureValue feature, ref double[] value_array)
+        {
+            int idx = 0;
+            value_array[idx++] = (feature.LeftEyeValuieL);
+            value_array[idx++] = (feature.LeftEyeValuieR);
+            value_array[idx++] = (feature.RightEyeValuieL);
+            value_array[idx++] = (feature.RightEyeValuieR);
+            value_array[idx++] = (feature.NoseLValuieL);
+            value_array[idx++] = (feature.NoseLValuieR);
+            value_array[idx++] = (feature.MouthLValuieL);
+            value_array[idx++] = (feature.MouthLValuieR);
         }
         public CvSVM svm { get; set; }
     }

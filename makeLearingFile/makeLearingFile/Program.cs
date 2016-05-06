@@ -30,7 +30,6 @@ namespace makeLearingFile
                 this.OutputFoldaName = folda_name;
 
                 //ファイルリストの読み込み
-                //ファイルリストの読み込み
                 ReadFileListTest();
 
                 //顔部分の切り出し
@@ -44,7 +43,7 @@ namespace makeLearingFile
                 CvHaarClassifierCascade cascade = CvHaarClassifierCascade.FromFile(@"C:\opencv2.4.8\sources\data\haarcascades\haarcascade_frontalface_alt.xml");
                 CvMemStorage strage = new CvMemStorage(0);   // メモリを確保
 
-                //フジキンリストの処理
+                //リストの処理
                 int read_count = 0;
                 while( read_count < this.FaceFileList.Count())
                 {
