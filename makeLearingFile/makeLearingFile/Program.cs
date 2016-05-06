@@ -39,42 +39,50 @@ namespace makeLearingFile
             //顔部分を抜き出す
             private void ExtractFace()
             {
-                //カスケード分類器の特徴量を取得する
-                CvHaarClassifierCascade cascade = CvHaarClassifierCascade.FromFile(@"C:\opencv2.4.8\sources\data\haarcascades\haarcascade_frontalface_alt.xml");
-                CvMemStorage strage = new CvMemStorage(0);   // メモリを確保
-
                 //リストの処理
                 int read_count = 0;
                 while( read_count < this.FaceFileList.Count())
                 {
                     string input_file_path = this.FaceFileList[read_count];
-
-                    using (IplImage img = new IplImage(input_file_path))
-                    {
-                        //グレースケールに変換
-                        using( IplImage gray_image = Cv.CreateImage(new CvSize(img.Width,img.Height),BitDepth.U8,1) )
-                        {
-                            Cv.CvtColor(img, gray_image, ColorConversion.BgrToGray);
-
-                            //発見した矩形
-                            var result = Cv.HaarDetectObjects(gray_image, cascade, strage);
-                            for (int i = 0; i < result.Total; i++)
-                            {
-                                //矩形の大きさに書き出す
-                                CvRect rect = result[i].Value.Rect;
-                                Cv.Rectangle(img, rect, new CvColor(255, 0, 0));
-
-                                //矩形部分をファイル出力する
-                                img.ROI = rect;
-                                string out_name = this.OutputFoldaName + @"\out" +  read_count + @"_" + i + @".bmp";
-                                Cv.SaveImage(out_name, img);
-                            }
-                        }
-                    }
+                    DetectFace(input_file_path,read_count);
                     read_count++;
                 }
             }
 
+            /// <summary>
+            /// 画像から顔を見つける
+            /// </summary>
+            /// <param name="file_name"></param>
+            /// <param name="read_count"></param>
+            private void DetectFace(String file_name,int read_count)
+            {
+                //カスケード分類器の特徴量を取得する
+                CvHaarClassifierCascade cascade = CvHaarClassifierCascade.FromFile(@"C:\opencv2.4.8\sources\data\haarcascades\haarcascade_frontalface_alt.xml");
+                CvMemStorage strage = new CvMemStorage(0);   // メモリを確保
+
+                using (IplImage img = new IplImage(file_name))
+                {
+                    //グレースケールに変換
+                    using (IplImage gray_image = Cv.CreateImage(new CvSize(img.Width, img.Height), BitDepth.U8, 1))
+                    {
+                        Cv.CvtColor(img, gray_image, ColorConversion.BgrToGray);
+
+                        //発見した矩形
+                        var result = Cv.HaarDetectObjects(gray_image, cascade, strage);
+                        for (int i = 0; i < result.Total; i++)
+                        {
+                            //矩形の大きさに書き出す
+                            CvRect rect = result[i].Value.Rect;
+                            Cv.Rectangle(img, rect, new CvColor(255, 0, 0));
+
+                            //矩形部分をファイル出力する
+                            img.ROI = rect;
+                            string out_name = this.OutputFoldaName + @"\out" + read_count + @"_" + i + @".bmp";
+                            Cv.SaveImage(out_name, img);
+                        }
+                    }
+                }
+            }
 
             //顔写真リストファイルを読み込み
             private void ReadFileListTest()
