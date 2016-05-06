@@ -49,8 +49,12 @@ namespace JudgeGUII
                 //OKボタンがクリックされたとき
                 //選択されたファイル名を表示する
                 Console.WriteLine(ofd.FileName);
+
+                this.InputFileName = ofd.FileName;
             }
 
         }
+
+        String InputFileName = @"";
     }
 }

@@ -12,10 +12,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{91A1B2
 		.nuget\NuGet.targets = .nuget\NuGet.targets
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "makeLearingFile", "..\makeLearingFile\makeLearingFile\makeLearingFile.csproj", "{4A3F02A1-73ED-4C9B-801D-5830C277DC26}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MakeSVMFile", "..\MakeSVMFile\MakeSVMFile\MakeSVMFile.csproj", "{5DE53FD1-F89C-423D-9993-5C9644C8C454}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -26,14 +22,6 @@ Global
 		{7BA208CD-69BB-4127-A613-A5383B78AC21}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7BA208CD-69BB-4127-A613-A5383B78AC21}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7BA208CD-69BB-4127-A613-A5383B78AC21}.Release|Any CPU.Build.0 = Release|Any CPU
-		{4A3F02A1-73ED-4C9B-801D-5830C277DC26}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{4A3F02A1-73ED-4C9B-801D-5830C277DC26}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{4A3F02A1-73ED-4C9B-801D-5830C277DC26}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{4A3F02A1-73ED-4C9B-801D-5830C277DC26}.Release|Any CPU.Build.0 = Release|Any CPU
-		{5DE53FD1-F89C-423D-9993-5C9644C8C454}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{5DE53FD1-F89C-423D-9993-5C9644C8C454}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{5DE53FD1-F89C-423D-9993-5C9644C8C454}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{5DE53FD1-F89C-423D-9993-5C9644C8C454}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
