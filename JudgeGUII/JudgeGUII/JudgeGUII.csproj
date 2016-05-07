@@ -71,6 +71,7 @@
     <Compile Include="Form1.Designer.cs">
       <DependentUpon>Form1.cs</DependentUpon>
     </Compile>
+    <Compile Include="InputDataModel.cs" />
     <Compile Include="other\FaceFeature.cs" />
     <Compile Include="other\SVMManage.cs" />
     <Compile Include="Program.cs" />

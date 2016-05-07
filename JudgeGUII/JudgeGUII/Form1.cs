@@ -51,6 +51,9 @@ namespace JudgeGUII
                 Console.WriteLine(ofd.FileName);
 
                 this.InputFileName = ofd.FileName;
+
+                InputDataModel idm = new InputDataModel();
+                idm.Exec(this.InputFileName);
             }
 
         }
