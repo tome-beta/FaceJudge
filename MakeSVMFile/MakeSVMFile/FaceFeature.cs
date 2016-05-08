@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using OpenCvSharp;
+using System.IO;
 
 namespace MakeSVMFile
 {
@@ -48,14 +49,14 @@ namespace MakeSVMFile
         //特徴量の算出
         public void DetectFacePoint()
         {
-            int read_count = 0;
-            while (read_count < this.FaceList.Count())
+            this.ReadCount = 0;
+            while (this.ReadCount < this.FaceList.Count())
             {
-                string input_file_path = this.FaceList[read_count];
-                int face_id = this.IDList[read_count];
+                string input_file_path = this.FaceList[this.ReadCount];
+                int face_id = this.IDList[this.ReadCount];
                 MakeFeatureFromFile(input_file_path,face_id);
 
-                read_count++;
+                this.ReadCount++;
             }
         }
 
@@ -102,13 +103,13 @@ namespace MakeSVMFile
                 //初期化
                 DataInit();
                 //デバッグ用の表示
-                //                    DebugPrint(tmp_image, read_count);
+                DebugPrint(tmp_image, this.ReadCount);
 
                 //左眼、右目、鼻、口の矩形を確定させる。
                 DecidePartsRect(gray_image);
 
                 //パーツ確定後
-                //                    DebugPrint2(gray_image, read_count);
+                DebugPrint2(gray_image, this.ReadCount);
 
                 PartsRectInfo parts_info;
                 parts_info.RightEye = this.RightEyeRect;
@@ -350,7 +351,11 @@ namespace MakeSVMFile
 
             using (new CvWindow(img))
             {
-                string out_name = this.OutPutFolda + @"\decide_parts" + count + @".jpeg";
+                //パスからファイル名を取る
+                string path = this.FaceList[this.ReadCount];
+                String file_name = Path.GetFileNameWithoutExtension(path);
+
+                string out_name = this.OutPutFolda + @"\decide_parts_" + file_name + @".jpeg";
                 Cv.SaveImage(out_name, img);
                 Cv.WaitKey();
             }
@@ -390,7 +395,11 @@ namespace MakeSVMFile
 
             using (new CvWindow(img))
             {
-                string out_name = this.OutPutFolda + @"\out" + count + @".jpeg";
+                //パスからファイル名を取る
+                string path = this.FaceList[this.ReadCount];
+                String file_name = Path.GetFileNameWithoutExtension(path);
+
+                string out_name = this.OutPutFolda + @"\find_" + file_name + @".jpeg";
                 Cv.SaveImage(out_name, img);
                 Cv.WaitKey();
             }
@@ -408,5 +417,7 @@ namespace MakeSVMFile
 
         CvRect RightEyeRect, LeftEyeRect, NoseRect, MouthRect;        //パーツの座標
         CvSeq<CvAvgComp> EyeResult, NoseResult, MouthResult;          //パーツ検出結果
+
+        private int ReadCount; //リストからの読み込み番号
     }
 }
