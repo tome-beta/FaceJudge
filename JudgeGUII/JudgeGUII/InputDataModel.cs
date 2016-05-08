@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using OpenCvSharp;
+using MakeSVMFile;
 
 namespace JudgeGUII
 {
@@ -12,12 +13,13 @@ namespace JudgeGUII
         public void Exec(String file_name)
         {
             this.ImageFileName = file_name;
-            LoadImageFile(this.ImageFileName);
-            FeatureFromIpl();
+            LoadImageFile(this.ImageFileName);  //画像読み込み＆顔切り抜き
+            FeatureFromIpl();                   //顔から特徴量の算出
+            SVMJudge();
         }
 
         //画像ファイルロード
-        public bool LoadImageFile(String file_name)
+        private bool LoadImageFile(String file_name)
         {
             //カスケード分類器の特徴量を取得する
             CvHaarClassifierCascade cascade = CvHaarClassifierCascade.FromFile(@"C:\opencv2.4.8\sources\data\haarcascades\haarcascade_frontalface_alt.xml");
@@ -44,11 +46,11 @@ namespace JudgeGUII
                         CvRect roi_rect = img.ROI;
                         IplImage ipl_image = Cv.CreateImage(new CvSize(img.Width, img.Height), BitDepth.U8, 1);
                         ipl_image = img.Clone(img.ROI);
-
+/*
                         //確認
                         new CvWindow(ipl_image);
                         Cv.WaitKey();
-
+*/
                         //見つけた顔候補をすべてチェックするために記録する
                         this.FaceIplList.Add(ipl_image);
                     }
@@ -57,7 +59,7 @@ namespace JudgeGUII
             }
         }
 
-        //特徴量作成
+        //IplImageから特徴量作成
         private bool FeatureFromIpl()
         {
             foreach(IplImage ipl_image in this.FaceIplList)
@@ -67,12 +69,25 @@ namespace JudgeGUII
             return true;
         }
 
+        //顔眼底
+        private void SVMJudge()
+        {
+            FaceFeature.FeatureValue feature = new FaceFeature.FeatureValue();
+            feature = FaceFeature.FeatuerValueList[0];
+
+            double[] value = new double[8];
+
+            this.SVMManage.SVMPredict(feature);
+
+        }
+
 
         //===================================
         //変数
         //===================================
         String ImageFileName = @"";
         List<IplImage> FaceIplList = new List<IplImage>();
-        MakeSVMFile.FaceFeature FaceFeature = new MakeSVMFile.FaceFeature();
+        FaceFeature FaceFeature = new MakeSVMFile.FaceFeature();
+        SVMManage SVMManage = new SVMManage();
     }
 }

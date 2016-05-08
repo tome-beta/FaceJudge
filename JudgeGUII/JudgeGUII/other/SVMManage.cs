@@ -64,6 +64,10 @@ namespace MakeSVMFile
             SetFeatureToArray(feature, ref feature_array);
             CvMat dataMat = new CvMat(1, 8, MatrixType.F32C1, feature_array, true);
 
+            //正規化する0～１．０に収まるようにする
+            //全部２で割る？最大値がだいたい１．６くらいのはずなので
+            dataMat /= 2.0;
+
             //学習ファイルを読み込む
             svm.Load(@"SvmLearning.xml");
 
