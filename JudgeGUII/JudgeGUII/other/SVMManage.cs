@@ -71,8 +71,7 @@ namespace MakeSVMFile
             //学習ファイルを読み込む
             svm.Load(@"SvmLearning.xml");
 
-//            bool ret = false;
-            float result = this.svm.Predict(dataMat);
+            int result = (int)this.svm.Predict(dataMat);
         }
 
         /// <summary>
