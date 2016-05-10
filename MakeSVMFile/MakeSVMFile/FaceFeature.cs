@@ -103,13 +103,13 @@ namespace MakeSVMFile
                 //初期化
                 DataInit();
                 //デバッグ用の表示
-                DebugPrint(tmp_image, this.ReadCount);
+///                DebugPrint(tmp_image, this.ReadCount);
 
                 //左眼、右目、鼻、口の矩形を確定させる。
                 DecidePartsRect(gray_image);
 
                 //パーツ確定後
-                DebugPrint2(gray_image, this.ReadCount);
+ ///               DebugPrint2(gray_image, this.ReadCount);
 
                 PartsRectInfo parts_info;
                 parts_info.RightEye = this.RightEyeRect;

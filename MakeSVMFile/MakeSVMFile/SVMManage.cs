@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using OpenCvSharp;
 using OpenCvSharp.CPlusPlus;
+using System.IO;
 
 namespace MakeSVMFile
 {
@@ -34,9 +35,39 @@ namespace MakeSVMFile
             }
             CvMat resMat = new CvMat(id_array.Length, 1, MatrixType.S32C1, id_array, true);
 
+            //デバッグ用　学習させる特徴量を出力する
+            using (StreamWriter w = new StreamWriter(@"debug_Feature.csv"))
+            {
+                for (int i = 0; i < id_array.Length; i++ )
+                {
+                    for (int fi = 0; fi < 8; fi++)
+                    {
+                        w.Write(feature_array[i*8 +fi] + ",");
+                    }
+                    w.Write(id_array[i] + "\n");
+                }
+            }
+
+
+
             //正規化する0～１．０に収まるようにする
             //全部２で割る？最大値がだいたい１．６くらいのはずなので
             dataMat /= 2.0;
+
+
+            //正規化後の値
+            using (StreamWriter w = new StreamWriter(@"debug_Feature_Normalaize.csv"))
+            {
+                for (int i = 0; i < id_array.Length; i++)
+                {
+                    for (int fi = 0; fi < 8; fi++)
+                    {
+                        double ans = feature_array[i * 8 + fi] / 2.0;
+                        w.Write( ans+ ",");
+                    }
+                    w.Write(id_array[i] + "\n");
+                }
+            }
 
             //SVMの用意
             CvTermCriteria criteria = new CvTermCriteria(1000, 0.000001);
