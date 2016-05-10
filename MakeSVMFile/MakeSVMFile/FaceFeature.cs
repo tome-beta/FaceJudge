@@ -175,8 +175,8 @@ namespace MakeSVMFile
             int RightEyeCenterY = input_info.RightEye.Y + input_info.RightEye.Height / 2;
 
             //右目の中心と左目の中心を結んだ線の中点が基準点。
-            output_info.basepoint.X = LeftEyeCenterX + RightEyeCenterX / 2;
-            output_info.basepoint.Y = LeftEyeCenterY + RightEyeCenterY / 2;
+            output_info.basepoint.X = (LeftEyeCenterX + RightEyeCenterX) / 2;
+            output_info.basepoint.Y = (LeftEyeCenterY + RightEyeCenterY) / 2;
 
             //目と目の距離をとる
             output_info.BothEyeDistance = makeTwoPointDistance(LeftEyeCenterX, RightEyeCenterX, LeftEyeCenterY, RightEyeCenterY);
