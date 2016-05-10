@@ -30,14 +30,14 @@ namespace MakeSVMFile
             public int ID;              //種類分け用のID
             public CvPoint basepoint;   //両目の間の基点
             public double BothEyeDistance; //目と目の間の距離
-            public double LeftEyeValuieL;
-            public double LeftEyeValuieR;
-            public double RightEyeValuieL;
-            public double RightEyeValuieR;
-            public double NoseLValuieL;
-            public double NoseLValuieR;
-            public double MouthLValuieL;
-            public double MouthLValuieR;
+            public double LeftEyeValueL;
+            public double LeftEyeValueR;
+            public double RightEyeValueL;
+            public double RightEyeValueR;
+            public double NoseLValueL;
+            public double NoseLValueR;
+            public double MouthLValueL;
+            public double MouthLValueR;
         };
         //コンストラクタ
         public FaceFeature()
@@ -103,13 +103,13 @@ namespace MakeSVMFile
                 //初期化
                 DataInit();
                 //デバッグ用の表示
-///                DebugPrint(tmp_image, this.ReadCount);
+//                DebugPrint(tmp_image, this.ReadCount);
 
                 //左眼、右目、鼻、口の矩形を確定させる。
                 DecidePartsRect(gray_image);
 
                 //パーツ確定後
- ///               DebugPrint2(gray_image, this.ReadCount);
+//                DebugPrint2(gray_image, this.ReadCount);
 
                 PartsRectInfo parts_info;
                 parts_info.RightEye = this.RightEyeRect;
@@ -139,14 +139,14 @@ namespace MakeSVMFile
             //仮に代入  
             output_info.basepoint = new CvPoint(0, 0);
             output_info.BothEyeDistance = 0;
-            output_info.LeftEyeValuieL = 0;
-            output_info.LeftEyeValuieR = 0;
-            output_info.RightEyeValuieL = 0;
-            output_info.RightEyeValuieR = 0;
-            output_info.NoseLValuieL = 0;
-            output_info.NoseLValuieR = 0;
-            output_info.MouthLValuieL = 0;
-            output_info.MouthLValuieR = 0;
+            output_info.LeftEyeValueL = 0;
+            output_info.LeftEyeValueR = 0;
+            output_info.RightEyeValueL = 0;
+            output_info.RightEyeValueR = 0;
+            output_info.NoseLValueL = 0;
+            output_info.NoseLValueR = 0;
+            output_info.MouthLValueL = 0;
+            output_info.MouthLValueR = 0;
             output_info.ID = 0;
 
             //パーツがすべてそろっているかの確認
@@ -175,58 +175,58 @@ namespace MakeSVMFile
             int RightEyeCenterY = input_info.RightEye.Y + input_info.RightEye.Height / 2;
 
             //右目の中心と左目の中心を結んだ線の中点が基準点。
-            output_info.basepoint.X = LeftEyeCenterX + RightEyeCenterX / 2;
-            output_info.basepoint.Y = LeftEyeCenterY + RightEyeCenterY / 2;
+            output_info.basepoint.X = (LeftEyeCenterX + RightEyeCenterX) / 2;
+            output_info.basepoint.Y = (LeftEyeCenterY + RightEyeCenterY) / 2;
 
             //目と目の距離をとる
             output_info.BothEyeDistance = makeTwoPointDistance(LeftEyeCenterX, RightEyeCenterX, LeftEyeCenterY, RightEyeCenterY);
             //基準点から各パーツの右端、左端までの距離をとる
-            output_info.LeftEyeValuieL = makeTwoPointDistance(input_info.LeftEye.X,
+            output_info.LeftEyeValueL = makeTwoPointDistance(input_info.LeftEye.X,
                                                               output_info.basepoint.X,
                                                               input_info.LeftEye.Y,
                                                               output_info.basepoint.Y);
-            output_info.LeftEyeValuieR = makeTwoPointDistance(input_info.LeftEye.X + input_info.LeftEye.Width,
+            output_info.LeftEyeValueR = makeTwoPointDistance(input_info.LeftEye.X + input_info.LeftEye.Width,
                                                               output_info.basepoint.X,
                                                               input_info.LeftEye.Y,
                                                               output_info.basepoint.Y);
 
-            output_info.RightEyeValuieL = makeTwoPointDistance(input_info.RightEye.X,
+            output_info.RightEyeValueL = makeTwoPointDistance(input_info.RightEye.X,
                                                               output_info.basepoint.X,
                                                               input_info.RightEye.Y,
                                                               output_info.basepoint.Y);
-            output_info.RightEyeValuieR = makeTwoPointDistance(input_info.RightEye.X + input_info.RightEye.Width,
+            output_info.RightEyeValueR = makeTwoPointDistance(input_info.RightEye.X + input_info.RightEye.Width,
                                                               output_info.basepoint.X,
                                                               input_info.RightEye.Y,
                                                               output_info.basepoint.Y);
 
-            output_info.NoseLValuieL = makeTwoPointDistance(input_info.Nose.X,
+            output_info.NoseLValueL = makeTwoPointDistance(input_info.Nose.X,
                                                   output_info.basepoint.X,
                                                   input_info.Nose.Y,
                                                   output_info.basepoint.Y);
-            output_info.NoseLValuieR = makeTwoPointDistance(input_info.Nose.X + input_info.Nose.Width,
+            output_info.NoseLValueR = makeTwoPointDistance(input_info.Nose.X + input_info.Nose.Width,
                                                               output_info.basepoint.X,
                                                               input_info.Nose.Y,
                                                               output_info.basepoint.Y);
 
-            output_info.MouthLValuieL = makeTwoPointDistance(input_info.Mouth.X,
+            output_info.MouthLValueL = makeTwoPointDistance(input_info.Mouth.X,
                                                   output_info.basepoint.X,
                                                   input_info.Mouth.Y,
                                                   output_info.basepoint.Y);
-            output_info.MouthLValuieR = makeTwoPointDistance(input_info.Mouth.X + input_info.Mouth.Width,
+            output_info.MouthLValueR = makeTwoPointDistance(input_info.Mouth.X + input_info.Mouth.Width,
                                                               output_info.basepoint.X,
                                                               input_info.Mouth.Y,
                                                               output_info.basepoint.Y);
 
 
             //基準点からパーツまでの距離と瞳間距離の比率を特徴量とする
-            output_info.LeftEyeValuieL /= output_info.BothEyeDistance;
-            output_info.LeftEyeValuieR /= output_info.BothEyeDistance;
-            output_info.RightEyeValuieL /= output_info.BothEyeDistance;
-            output_info.RightEyeValuieR /= output_info.BothEyeDistance;
-            output_info.NoseLValuieL /= output_info.BothEyeDistance;
-            output_info.NoseLValuieR /= output_info.BothEyeDistance;
-            output_info.MouthLValuieL /= output_info.BothEyeDistance;
-            output_info.MouthLValuieR /= output_info.BothEyeDistance;
+            output_info.LeftEyeValueL /= output_info.BothEyeDistance;
+            output_info.LeftEyeValueR /= output_info.BothEyeDistance;
+            output_info.RightEyeValueL /= output_info.BothEyeDistance;
+            output_info.RightEyeValueR /= output_info.BothEyeDistance;
+            output_info.NoseLValueL /= output_info.BothEyeDistance;
+            output_info.NoseLValueR /= output_info.BothEyeDistance;
+            output_info.MouthLValueL /= output_info.BothEyeDistance;
+            output_info.MouthLValueR /= output_info.BothEyeDistance;
 
             return true;
         }
