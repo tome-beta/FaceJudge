@@ -88,14 +88,14 @@ namespace MakeSVMFile
 
             for(int i = 0; i < FeatureList.Count;i++)
             {
-                value_array[idx++] = (FeatureList[i].LeftEyeValuieL);
-                value_array[idx++] = (FeatureList[i].LeftEyeValuieR);
-                value_array[idx++] = (FeatureList[i].RightEyeValuieL);
-                value_array[idx++] = (FeatureList[i].RightEyeValuieR);
-                value_array[idx++] = (FeatureList[i].NoseLValuieL);
-                value_array[idx++] = (FeatureList[i].NoseLValuieR);
-                value_array[idx++] = (FeatureList[i].MouthLValuieL);
-                value_array[idx++] = (FeatureList[i].MouthLValuieR);
+                value_array[idx++] = (FeatureList[i].LeftEyeValueL);
+                value_array[idx++] = (FeatureList[i].LeftEyeValueR);
+                value_array[idx++] = (FeatureList[i].RightEyeValueL);
+                value_array[idx++] = (FeatureList[i].RightEyeValueR);
+                value_array[idx++] = (FeatureList[i].NoseLValueL);
+                value_array[idx++] = (FeatureList[i].NoseLValueR);
+                value_array[idx++] = (FeatureList[i].MouthLValueL);
+                value_array[idx++] = (FeatureList[i].MouthLValueR);
             }
         }
 
@@ -107,14 +107,14 @@ namespace MakeSVMFile
         private void SetFeatureToArray(FaceFeature.FeatureValue feature, ref double[] value_array)
         {
             int idx = 0;
-            value_array[idx++] = (feature.LeftEyeValuieL);
-            value_array[idx++] = (feature.LeftEyeValuieR);
-            value_array[idx++] = (feature.RightEyeValuieL);
-            value_array[idx++] = (feature.RightEyeValuieR);
-            value_array[idx++] = (feature.NoseLValuieL);
-            value_array[idx++] = (feature.NoseLValuieR);
-            value_array[idx++] = (feature.MouthLValuieL);
-            value_array[idx++] = (feature.MouthLValuieR);
+            value_array[idx++] = (feature.LeftEyeValueL);
+            value_array[idx++] = (feature.LeftEyeValueR);
+            value_array[idx++] = (feature.RightEyeValueL);
+            value_array[idx++] = (feature.RightEyeValueR);
+            value_array[idx++] = (feature.NoseLValueL);
+            value_array[idx++] = (feature.NoseLValueR);
+            value_array[idx++] = (feature.MouthLValueL);
+            value_array[idx++] = (feature.MouthLValueR);
         }
         public CvSVM svm { get; set; }
     }
