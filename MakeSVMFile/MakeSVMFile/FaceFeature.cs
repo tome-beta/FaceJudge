@@ -97,19 +97,39 @@ namespace MakeSVMFile
 
                 //発見した矩形
                 this.EyeResult = Cv.HaarDetectObjects(gray_image, eye_cascade, strage);
-                this.NoseResult = Cv.HaarDetectObjects(gray_image, nose_cascade, strage);
-                this.MouthResult = Cv.HaarDetectObjects(gray_image, mouth_cascade, strage);
 
+                //鼻は画像の真ん中の方だけ
+                {
+                    IplImage gray_nose_image = Cv.CreateImage(new CvSize(tmp_image.Width, tmp_image.Height), BitDepth.U8, 1);
+                    Cv.CvtColor(tmp_image, gray_nose_image, ColorConversion.BgrToGray);
+                    CvRect rect = new CvRect(0, (int)(tmp_image.Height*0.25), tmp_image.Width, tmp_image.Height / 2);
+                    gray_nose_image.ROI = rect;
+//                  new CvWindow(gray_nose_image);
+//                  Cv.WaitKey();
+
+                    this.NoseResult = Cv.HaarDetectObjects(gray_nose_image, nose_cascade, strage);
+                }
+
+                //口は画像の下半分だけを調べる
+                {
+                    IplImage gray_mouth_image = Cv.CreateImage(new CvSize(tmp_image.Width, tmp_image.Height), BitDepth.U8, 1);
+                    Cv.CvtColor(tmp_image, gray_mouth_image, ColorConversion.BgrToGray);
+                    CvRect rect = new CvRect(0, (int)(tmp_image.Height *0.66), tmp_image.Width, tmp_image.Height / 3);
+                    gray_mouth_image.ROI = rect;
+                    new CvWindow(gray_mouth_image);
+                     Cv.WaitKey();
+                    this.MouthResult = Cv.HaarDetectObjects(gray_mouth_image, mouth_cascade, strage);
+                }
                 //初期化
                 DataInit();
                 //デバッグ用の表示
-//                DebugPrint(tmp_image, this.ReadCount);
+                DebugPrint(tmp_image, this.ReadCount);
 
                 //左眼、右目、鼻、口の矩形を確定させる。
                 DecidePartsRect(gray_image);
 
                 //パーツ確定後
-//                DebugPrint2(gray_image, this.ReadCount);
+                DebugPrint2(gray_image, this.ReadCount);
 
                 PartsRectInfo parts_info;
                 parts_info.RightEye = this.RightEyeRect;
@@ -287,6 +307,8 @@ namespace MakeSVMFile
             for (int i = 0; i < this.NoseResult.Total; i++)
             {
                 CvRect rect = this.NoseResult[i].Value.Rect;
+                //中央だけ検索しているので座標を加える
+                rect.Y += (int)(img.Height * 0.25);
                 int rect_size = rect.Height * rect.Width;
 
                 //画像の中央に位置するはず
@@ -307,6 +329,8 @@ namespace MakeSVMFile
             for (int i = 0; i < this.MouthResult.Total; i++)
             {
                 CvRect rect = this.MouthResult[i].Value.Rect;
+                //下半分だけ検索しているのでその座標が出ているから加える
+                rect.Y += (int)(img.Height *0.66);
                 int rect_size = rect.Height * rect.Width;
 
                 //画像の下半分にあるはず
@@ -382,6 +406,8 @@ namespace MakeSVMFile
             {
                 //矩形の大きさに書き出す
                 CvRect rect = NoseResult[i].Value.Rect;
+                //中央だけ検索しているので座標を加える
+                rect.Y += (int)(img.Height * 0.25);
                 Cv.Rectangle(img, rect, new CvColor(0, 255, 0));
             }
 
@@ -390,6 +416,8 @@ namespace MakeSVMFile
             {
                 //矩形の大きさに書き出す
                 CvRect rect = MouthResult[i].Value.Rect;
+                //下半分だけ検索しているのでその座標が出ているから加える
+                rect.Y += (int)(img.Height * 0.66);
                 Cv.Rectangle(img, rect, new CvColor(0, 0, 255));
             }
 
