@@ -98,18 +98,27 @@ namespace MakeSVMFile
                 //発見した矩形
                 this.EyeResult = Cv.HaarDetectObjects(gray_image, eye_cascade, strage);
                 this.NoseResult = Cv.HaarDetectObjects(gray_image, nose_cascade, strage);
-                this.MouthResult = Cv.HaarDetectObjects(gray_image, mouth_cascade, strage);
 
-                //初期化
-                DataInit();
+                //口は画像の下半分だけを調べる
+                IplImage gray_mouth_image = Cv.CreateImage(new CvSize(tmp_image.Width, tmp_image.Height), BitDepth.U8, 1);
+                Cv.CvtColor(tmp_image, gray_mouth_image, ColorConversion.BgrToGray);
+                CvRect rect = new CvRect(0, tmp_image.Height / 2, tmp_image.Width, tmp_image.Height / 2);
+                gray_mouth_image.ROI = rect;
+                new CvWindow(gray_mouth_image);
+                 Cv.WaitKey();
+
+                this.MouthResult = Cv.HaarDetectObjects(gray_mouth_image, mouth_cascade, strage);
+
+                    //初期化
+                    DataInit();
                 //デバッグ用の表示
-//                DebugPrint(tmp_image, this.ReadCount);
+                DebugPrint(tmp_image, this.ReadCount);
 
                 //左眼、右目、鼻、口の矩形を確定させる。
                 DecidePartsRect(gray_image);
 
                 //パーツ確定後
-//                DebugPrint2(gray_image, this.ReadCount);
+                DebugPrint2(gray_image, this.ReadCount);
 
                 PartsRectInfo parts_info;
                 parts_info.RightEye = this.RightEyeRect;
@@ -307,6 +316,8 @@ namespace MakeSVMFile
             for (int i = 0; i < this.MouthResult.Total; i++)
             {
                 CvRect rect = this.MouthResult[i].Value.Rect;
+                //下半分だけ検索しているのでその座標が出ているから加える
+                rect.Y += (img.Height / 2);
                 int rect_size = rect.Height * rect.Width;
 
                 //画像の下半分にあるはず
@@ -390,6 +401,8 @@ namespace MakeSVMFile
             {
                 //矩形の大きさに書き出す
                 CvRect rect = MouthResult[i].Value.Rect;
+                //下半分だけ検索しているのでその座標が出ているから加える
+                rect.Y += (img.Height / 2);
                 Cv.Rectangle(img, rect, new CvColor(0, 0, 255));
             }
 
