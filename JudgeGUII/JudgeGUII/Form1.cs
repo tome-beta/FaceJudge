@@ -53,7 +53,25 @@ namespace JudgeGUII
                 this.InputFileName = ofd.FileName;
 
                 InputDataModel idm = new InputDataModel();
-                idm.Exec(this.InputFileName);
+                int ret = idm.Exec(this.InputFileName);
+
+                if( ret >= 0)
+                {
+                    //エラー表示
+                    MessageBox.Show("検出完了",
+                    "完了",
+                    MessageBoxButtons.OK
+                    );
+                }
+                else if( ret == -1)
+                {
+                    //エラー表示
+                    MessageBox.Show("入力画像から顔パーツを検出出来ませんでした",
+                    "エラー",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Error);
+                }
+
             }
 
         }
