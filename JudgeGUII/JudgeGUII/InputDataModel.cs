@@ -19,8 +19,8 @@ namespace JudgeGUII
 
             if (FaceFeature.FeatuerValueList.Count >= 1)
             {
-                SVMJudge();
-                return 0;
+                int result = SVMJudge();
+                return result;
             }
             else
             {
@@ -82,13 +82,14 @@ namespace JudgeGUII
         }
 
         //顔眼底
-        private void SVMJudge()
+        private int  SVMJudge()
         {
             FaceFeature.FeatureValue feature = new FaceFeature.FeatureValue();
 
             feature = FaceFeature.FeatuerValueList[0];
             double[] value = new double[8];
             int ret = this.SVMManage.SVMPredict(feature);
+            return ret;
         }
 
 
