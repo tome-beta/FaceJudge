@@ -58,7 +58,7 @@ namespace MakeSVMFile
         }
 
         //SVM判定
-        public void SVMPredict(FaceFeature.FeatureValue feature)
+        public int SVMPredict(FaceFeature.FeatureValue feature)
         {
             double[] feature_array = new double[8];
             SetFeatureToArray(feature, ref feature_array);
@@ -71,7 +71,7 @@ namespace MakeSVMFile
             //学習ファイルを読み込む
             svm.Load(@"SvmLearning.xml");
 
-            int result = (int)this.svm.Predict(dataMat);
+            return (int)this.svm.Predict(dataMat);
         }
 
         /// <summary>

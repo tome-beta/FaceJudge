@@ -5,17 +5,29 @@ using System.Text;
 using System.Threading.Tasks;
 using OpenCvSharp;
 using MakeSVMFile;
+using System.IO;
 
 namespace JudgeGUII
 {
     class InputDataModel
     {
-        public void Exec(String file_name)
+        public int Exec(String file_name)
         {
             this.ImageFileName = file_name;
             LoadImageFile(this.ImageFileName);  //画像読み込み＆顔切り抜き
             FeatureFromIpl();                   //顔から特徴量の算出
-            SVMJudge();
+
+            if (FaceFeature.FeatuerValueList.Count >= 1)
+            {
+                SVMJudge();
+                return 0;
+            }
+            else
+            {
+                //特徴量が取れなかった
+                return -1;
+            }
+
         }
 
         //画像ファイルロード
@@ -73,12 +85,10 @@ namespace JudgeGUII
         private void SVMJudge()
         {
             FaceFeature.FeatureValue feature = new FaceFeature.FeatureValue();
+
             feature = FaceFeature.FeatuerValueList[0];
-
             double[] value = new double[8];
-
-            this.SVMManage.SVMPredict(feature);
-
+            int ret = this.SVMManage.SVMPredict(feature);
         }
 
 
