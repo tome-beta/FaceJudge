@@ -29,6 +29,7 @@
         private void InitializeComponent()
         {
             this.buttonStart = new System.Windows.Forms.Button();
+            this.buttonReadList = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // buttonStart
@@ -41,11 +42,23 @@
             this.buttonStart.UseVisualStyleBackColor = true;
             this.buttonStart.Click += new System.EventHandler(this.buttonStart_Click);
             // 
+            // buttonReadList
+            // 
+            this.buttonReadList.Font = new System.Drawing.Font("メイリオ", 14.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
+            this.buttonReadList.Location = new System.Drawing.Point(113, 147);
+            this.buttonReadList.Name = "buttonReadList";
+            this.buttonReadList.Size = new System.Drawing.Size(159, 81);
+            this.buttonReadList.TabIndex = 2;
+            this.buttonReadList.Text = "リスト読み込み";
+            this.buttonReadList.UseVisualStyleBackColor = true;
+            this.buttonReadList.Click += new System.EventHandler(this.buttonReadList_Click);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(284, 261);
+            this.Controls.Add(this.buttonReadList);
             this.Controls.Add(this.buttonStart);
             this.Name = "Form1";
             this.Text = "Form1";
@@ -56,6 +69,7 @@
         #endregion
 
         private System.Windows.Forms.Button buttonStart;
+        private System.Windows.Forms.Button buttonReadList;
     }
 }
 

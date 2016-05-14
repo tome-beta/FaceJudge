@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using OpenCvSharp;
 using OpenCvSharp.CPlusPlus;
+using System.IO;
 
 namespace MakeSVMFile
 {
@@ -34,9 +35,39 @@ namespace MakeSVMFile
             }
             CvMat resMat = new CvMat(id_array.Length, 1, MatrixType.S32C1, id_array, true);
 
+            //デバッグ用　学習させる特徴量を出力する
+            using (StreamWriter w = new StreamWriter(@"debug_Feature.csv"))
+            {
+                for (int i = 0; i < id_array.Length; i++ )
+                {
+                    for (int fi = 0; fi < 8; fi++)
+                    {
+                        w.Write(feature_array[i*8 +fi] + ",");
+                    }
+                    w.Write(id_array[i] + "\n");
+                }
+            }
+
+
+
             //正規化する0～１．０に収まるようにする
             //全部２で割る？最大値がだいたい１．６くらいのはずなので
             dataMat /= 2.0;
+
+
+            //正規化後の値
+            using (StreamWriter w = new StreamWriter(@"debug_Feature_Normalaize.csv"))
+            {
+                for (int i = 0; i < id_array.Length; i++)
+                {
+                    for (int fi = 0; fi < 8; fi++)
+                    {
+                        double ans = feature_array[i * 8 + fi] / 2.0;
+                        w.Write( ans+ ",");
+                    }
+                    w.Write(id_array[i] + "\n");
+                }
+            }
 
             //SVMの用意
             CvTermCriteria criteria = new CvTermCriteria(1000, 0.000001);
@@ -46,7 +77,7 @@ namespace MakeSVMFile
                 10.0,  // degree
                 8.0,  // gamma        調整
                 1.0, // coeff0
-                10.0, // c               調整
+                1000.0, // c               調整
                 0.5, // nu
                 0.1, // p
                 null,
@@ -64,14 +95,16 @@ namespace MakeSVMFile
             SetFeatureToArray(feature, ref feature_array);
             CvMat dataMat = new CvMat(1, 8, MatrixType.F32C1, feature_array, true);
 
-            //正規化する0～１．０に収まるようにする
-            //全部２で割る？最大値がだいたい１．６くらいのはずなので
-            dataMat /= 2.0;
-
             //学習ファイルを読み込む
             svm.Load(@"SvmLearning.xml");
 
             return (int)this.svm.Predict(dataMat);
+        }
+
+
+        private void MakeFeature()
+        {
+
         }
 
         /// <summary>
@@ -79,20 +112,20 @@ namespace MakeSVMFile
         /// </summary>
         /// <param name="FeatureList"></param>
         /// <param name="id_list"></param>
-        public void SetFeatureListToArray(List<FaceFeature.FeatureValue> FeatureList, ref double[] value_array)
+        private void SetFeatureListToArray(List<FaceFeature.FeatureValue> FeatureList, ref double[] value_array)
         {
             int idx = 0;
 
             for(int i = 0; i < FeatureList.Count;i++)
             {
-                value_array[idx++] = (FeatureList[i].LeftEyeValuieL);
-                value_array[idx++] = (FeatureList[i].LeftEyeValuieR);
-                value_array[idx++] = (FeatureList[i].RightEyeValuieL);
-                value_array[idx++] = (FeatureList[i].RightEyeValuieR);
-                value_array[idx++] = (FeatureList[i].NoseLValuieL);
-                value_array[idx++] = (FeatureList[i].NoseLValuieR);
-                value_array[idx++] = (FeatureList[i].MouthLValuieL);
-                value_array[idx++] = (FeatureList[i].MouthLValuieR);
+                value_array[idx++] = (FeatureList[i].LeftEyeValueL);
+                value_array[idx++] = (FeatureList[i].LeftEyeValueR);
+                value_array[idx++] = (FeatureList[i].RightEyeValueL);
+                value_array[idx++] = (FeatureList[i].RightEyeValueR);
+                value_array[idx++] = (FeatureList[i].NoseLValueL);
+                value_array[idx++] = (FeatureList[i].NoseLValueR);
+                value_array[idx++] = (FeatureList[i].MouthLValueL);
+                value_array[idx++] = (FeatureList[i].MouthLValueR);
             }
         }
 
@@ -101,17 +134,17 @@ namespace MakeSVMFile
         /// </summary>
         /// <param name="feature"></param>
         /// <param name="value_array"></param>
-        public void SetFeatureToArray(FaceFeature.FeatureValue feature, ref double[] value_array)
+        private void SetFeatureToArray(FaceFeature.FeatureValue feature, ref double[] value_array)
         {
             int idx = 0;
-            value_array[idx++] = (feature.LeftEyeValuieL);
-            value_array[idx++] = (feature.LeftEyeValuieR);
-            value_array[idx++] = (feature.RightEyeValuieL);
-            value_array[idx++] = (feature.RightEyeValuieR);
-            value_array[idx++] = (feature.NoseLValuieL);
-            value_array[idx++] = (feature.NoseLValuieR);
-            value_array[idx++] = (feature.MouthLValuieL);
-            value_array[idx++] = (feature.MouthLValuieR);
+            value_array[idx++] = (feature.LeftEyeValueL);
+            value_array[idx++] = (feature.LeftEyeValueR);
+            value_array[idx++] = (feature.RightEyeValueL);
+            value_array[idx++] = (feature.RightEyeValueR);
+            value_array[idx++] = (feature.NoseLValueL);
+            value_array[idx++] = (feature.NoseLValueR);
+            value_array[idx++] = (feature.MouthLValueL);
+            value_array[idx++] = (feature.MouthLValueR);
         }
         public CvSVM svm { get; set; }
     }

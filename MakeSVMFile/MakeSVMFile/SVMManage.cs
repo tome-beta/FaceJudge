@@ -77,7 +77,7 @@ namespace MakeSVMFile
                 10.0,  // degree
                 8.0,  // gamma        調整
                 1.0, // coeff0
-                10.0, // c               調整
+                1000.0, // c               調整
                 0.5, // nu
                 0.1, // p
                 null,
@@ -89,7 +89,7 @@ namespace MakeSVMFile
         }
 
         //SVM判定
-        public void SVMPredict(FaceFeature.FeatureValue feature)
+        public int SVMPredict(FaceFeature.FeatureValue feature)
         {
             double[] feature_array = new double[8];
             SetFeatureToArray(feature, ref feature_array);
@@ -98,7 +98,7 @@ namespace MakeSVMFile
             //学習ファイルを読み込む
             svm.Load(@"SvmLearning.xml");
 
-            float result = this.svm.Predict(dataMat);
+            return (int)this.svm.Predict(dataMat);
         }
 
 

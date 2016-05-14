@@ -60,11 +60,24 @@ namespace MakeSVMFile
             }
         }
 
+//        iplImageから特徴量をだす処理
         /// <summary>
         /// ファイル名から特徴量を出す処理
         /// </summary>
         /// <param name="file_name"></param>
-        private void MakeFeatureFromFile(String file_name,int face_id)
+        private void MakeFeatureFromFile(String file_name, int face_id)
+        {
+            //画像読み込み処理
+            using (IplImage img = new IplImage(file_name))
+            {
+                MakeFeatureFromIpl(img, face_id);
+            }
+        }
+        /// <summary>
+        /// ファイル名から特徴量を出す処理
+        /// </summary>
+        /// <param name="file_name"></param>
+        public  void MakeFeatureFromIpl(IplImage ipl_image, int face_id)
         {
             string eye_cascade_xml = @"C:\opencv2.4.8\sources\data\haarcascades\haarcascade_eye.xml";
             string nose_cascade_xml = @"C:\opencv2.4.8\sources\data\haarcascades\haarcascade_mcs_nose.xml";
@@ -76,19 +89,19 @@ namespace MakeSVMFile
             CvHaarClassifierCascade mouth_cascade = CvHaarClassifierCascade.FromFile(mouth_cascade_xml);
 
             //リストにあるファイルを一枚づつデータにする
-            using (IplImage img = new IplImage(file_name))
+//            using (IplImage img = new IplImage(file_name))
             {
                 IplImage tmp_image;
                 //サイズが小さければ拡大して使う
-                if (img.Size.Width < SMALL_IMAGE_LIMIT)
+                if (ipl_image.Size.Width < SMALL_IMAGE_LIMIT)
                 {
-                    tmp_image = Cv.CreateImage(new CvSize(img.Width * IMAGE_RESIZE_RATE, img.Height * IMAGE_RESIZE_RATE), BitDepth.U8, 3);
-                    Cv.Resize(img, tmp_image);
+                    tmp_image = Cv.CreateImage(new CvSize(ipl_image.Width * IMAGE_RESIZE_RATE, ipl_image.Height * IMAGE_RESIZE_RATE), BitDepth.U8, 3);
+                    Cv.Resize(ipl_image, tmp_image);
                 }
                 else
                 {
-                    tmp_image = Cv.CreateImage(new CvSize(img.Width, img.Height), BitDepth.U8, 3);
-                    Cv.Resize(img, tmp_image);
+                    tmp_image = Cv.CreateImage(new CvSize(ipl_image.Width, ipl_image.Height), BitDepth.U8, 3);
+                    Cv.Resize(ipl_image, tmp_image);
                 }
 
                 //グレースケールに変換
@@ -123,13 +136,13 @@ namespace MakeSVMFile
                 //初期化
                 DataInit();
                 //デバッグ用の表示
-                DebugPrint(tmp_image, this.ReadCount);
+//                DebugPrint(tmp_image, this.ReadCount);
 
                 //左眼、右目、鼻、口の矩形を確定させる。
                 DecidePartsRect(gray_image);
 
                 //パーツ確定後
-                DebugPrint2(gray_image, this.ReadCount);
+//                DebugPrint2(gray_image, this.ReadCount);
 
                 PartsRectInfo parts_info;
                 parts_info.RightEye = this.RightEyeRect;
