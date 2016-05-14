@@ -116,8 +116,8 @@ namespace MakeSVMFile
                     Cv.CvtColor(tmp_image, gray_mouth_image, ColorConversion.BgrToGray);
                     CvRect rect = new CvRect(0, (int)(tmp_image.Height *0.66), tmp_image.Width, tmp_image.Height / 3);
                     gray_mouth_image.ROI = rect;
-                    new CvWindow(gray_mouth_image);
-                     Cv.WaitKey();
+//                    new CvWindow(gray_mouth_image);
+//                     Cv.WaitKey();
                     this.MouthResult = Cv.HaarDetectObjects(gray_mouth_image, mouth_cascade, strage);
                 }
                 //初期化
@@ -314,7 +314,7 @@ namespace MakeSVMFile
                 //画像の中央に位置するはず
                 if (rect.X < image_half_x && image_half_x < rect.X + rect.Width)
                 {
-                    if (rect.Y < image_half_y && image_half_y < rect.Y + rect.Height)
+///                    if (rect.Y < image_half_y && image_half_y < rect.Y + rect.Height)
                     {
                         //サイズの大きい矩形を採用
                         if (this.NoseRect.Width * this.NoseRect.Height <= rect_size)
