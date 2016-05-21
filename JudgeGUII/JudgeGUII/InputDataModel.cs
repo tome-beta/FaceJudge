@@ -87,7 +87,7 @@ namespace JudgeGUII
             FaceFeature.FeatureValue feature = new FaceFeature.FeatureValue();
 
             feature = FaceFeature.FeatuerValueList[0];
-            double[] value = new double[8];
+            double[] value = new double[2];
             int ret = this.SVMManage.SVMPredict(feature);
             return ret;
         }

@@ -30,6 +30,7 @@
         {
             this.buttonStart = new System.Windows.Forms.Button();
             this.buttonReadList = new System.Windows.Forms.Button();
+            this.labelName = new System.Windows.Forms.Label();
             this.SuspendLayout();
             // 
             // buttonStart
@@ -53,16 +54,28 @@
             this.buttonReadList.UseVisualStyleBackColor = true;
             this.buttonReadList.Click += new System.EventHandler(this.buttonReadList_Click);
             // 
+            // labelName
+            // 
+            this.labelName.AutoSize = true;
+            this.labelName.Font = new System.Drawing.Font("メイリオ", 14.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
+            this.labelName.Location = new System.Drawing.Point(22, 245);
+            this.labelName.Name = "labelName";
+            this.labelName.Size = new System.Drawing.Size(103, 28);
+            this.labelName.TabIndex = 3;
+            this.labelName.Text = "file_name";
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(284, 261);
+            this.ClientSize = new System.Drawing.Size(284, 311);
+            this.Controls.Add(this.labelName);
             this.Controls.Add(this.buttonReadList);
             this.Controls.Add(this.buttonStart);
             this.Name = "Form1";
             this.Text = "Form1";
             this.ResumeLayout(false);
+            this.PerformLayout();
 
         }
 
@@ -70,6 +83,7 @@
 
         private System.Windows.Forms.Button buttonStart;
         private System.Windows.Forms.Button buttonReadList;
+        private System.Windows.Forms.Label labelName;
     }
 }
 

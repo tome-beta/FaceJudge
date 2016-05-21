@@ -160,6 +160,10 @@ namespace MakeSVMFile
                     feature_value.ID = face_id;
                     this.FeatuerValueList.Add(feature_value);
                 }
+
+                eye_cascade.Dispose();
+                nose_cascade.Dispose();
+                mouth_cascade.Dispose();
             }
         }
 

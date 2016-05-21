@@ -132,9 +132,13 @@ namespace JudgeGUII
             //ファイルの数だけ実行
             foreach (String file_name in this.InputFileNameList)
             {
-                Console.WriteLine(file_name);
                 int ret = idm.Exec(file_name);
                 this.PredictResultList.Add(ret); //結果も用意しておく
+
+                String str = file_name + @" " +ret.ToString();
+                Console.WriteLine(str);
+                this.labelName.Text = str;
+                labelName.Refresh();
             }
 
 
