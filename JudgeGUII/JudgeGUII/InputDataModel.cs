@@ -81,7 +81,7 @@ namespace JudgeGUII
             return true;
         }
 
-        //顔眼底
+        //顔判定
         private int  SVMJudge()
         {
             FaceFeature.FeatureValue feature = new FaceFeature.FeatureValue();

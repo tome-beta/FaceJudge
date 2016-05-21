@@ -105,7 +105,8 @@ namespace MakeSVMFile
             return (int)this.svm.Predict(dataMat);
         }
 
-        private int MakeFeature(double x,double y)
+        //学習ファイルのテスト用
+        public int CheckSVMPredict(double x, double y)
         {
             double[] feature_array = new double[2];
             feature_array[0] = x;
