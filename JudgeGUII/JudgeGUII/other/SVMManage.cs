@@ -19,13 +19,13 @@ namespace MakeSVMFile
         //学習ファイルの作成
         public void LearningExec(List<FaceFeature.FeatureValue> FeatureList)
         {
-            //特徴量をMatに移し替える　８個で一つ
-            //8個のfloat * LISTの大きさの配列
-            double[] feature_array = new double[8 * FeatureList.Count];
+            //特徴量をMatに移し替える　2個で一つ
+            //2個のfloat * LISTの大きさの配列
+            double[] feature_array = new double[2 * FeatureList.Count];
 
             //特徴量をSVMで扱えるように配列に置き換える
             SetFeatureListToArray(FeatureList,ref feature_array);
-            CvMat dataMat = new CvMat(feature_array.Length / 8, 8, MatrixType.F32C1, feature_array, true);
+            CvMat dataMat = new CvMat(feature_array.Length / 2, 2, MatrixType.F32C1, feature_array, true);
 
             //これがラベル番号
             int[] id_array = new int[FeatureList.Count];
@@ -40,9 +40,9 @@ namespace MakeSVMFile
             {
                 for (int i = 0; i < id_array.Length; i++ )
                 {
-                    for (int fi = 0; fi < 8; fi++)
+                    for (int fi = 0; fi < 2; fi++)
                     {
-                        w.Write(feature_array[i*8 +fi] + ",");
+                        w.Write(feature_array[i*2 +fi] + ",");
                     }
                     w.Write(id_array[i] + "\n");
                 }
@@ -60,9 +60,9 @@ namespace MakeSVMFile
             {
                 for (int i = 0; i < id_array.Length; i++)
                 {
-                    for (int fi = 0; fi < 8; fi++)
+                    for (int fi = 0; fi < 2; fi++)
                     {
-                        double ans = feature_array[i * 8 + fi] / 2.0;
+                        double ans = feature_array[i * 2 + fi] / 2.0;
                         w.Write( ans+ ",");
                     }
                     w.Write(id_array[i] + "\n");
@@ -75,9 +75,9 @@ namespace MakeSVMFile
                 SVMType.CSvc,
                 SVMKernelType.Rbf,
                 10.0,  // degree
-                8.0,  // gamma        調整
+                8096.0,  // gamma        調整
                 1.0, // coeff0
-                1000.0, // c               調整
+                8096.0, // c               調整
                 0.5, // nu
                 0.1, // p
                 null,
@@ -91,9 +91,9 @@ namespace MakeSVMFile
         //SVM判定
         public int SVMPredict(FaceFeature.FeatureValue feature)
         {
-            double[] feature_array = new double[8];
+            double[] feature_array = new double[2];
             SetFeatureToArray(feature, ref feature_array);
-            CvMat dataMat = new CvMat(1, 8, MatrixType.F32C1, feature_array, true);
+            CvMat dataMat = new CvMat(1, 2, MatrixType.F32C1, feature_array, true);
 
             //学習ファイルを読み込む
             svm.Load(@"SvmLearning.xml");
@@ -119,13 +119,13 @@ namespace MakeSVMFile
             for(int i = 0; i < FeatureList.Count;i++)
             {
                 value_array[idx++] = (FeatureList[i].LeftEyeValueL);
-                value_array[idx++] = (FeatureList[i].LeftEyeValueR);
-                value_array[idx++] = (FeatureList[i].RightEyeValueL);
-                value_array[idx++] = (FeatureList[i].RightEyeValueR);
+//                value_array[idx++] = (FeatureList[i].LeftEyeValueR);
+//                value_array[idx++] = (FeatureList[i].RightEyeValueL);
+//                value_array[idx++] = (FeatureList[i].RightEyeValueR);
                 value_array[idx++] = (FeatureList[i].NoseLValueL);
-                value_array[idx++] = (FeatureList[i].NoseLValueR);
-                value_array[idx++] = (FeatureList[i].MouthLValueL);
-                value_array[idx++] = (FeatureList[i].MouthLValueR);
+//                value_array[idx++] = (FeatureList[i].NoseLValueR);
+//                value_array[idx++] = (FeatureList[i].MouthLValueL);
+//                value_array[idx++] = (FeatureList[i].MouthLValueR);
             }
         }
 
@@ -138,13 +138,13 @@ namespace MakeSVMFile
         {
             int idx = 0;
             value_array[idx++] = (feature.LeftEyeValueL);
-            value_array[idx++] = (feature.LeftEyeValueR);
-            value_array[idx++] = (feature.RightEyeValueL);
-            value_array[idx++] = (feature.RightEyeValueR);
+//            value_array[idx++] = (feature.LeftEyeValueR);
+//            value_array[idx++] = (feature.RightEyeValueL);
+//            value_array[idx++] = (feature.RightEyeValueR);
             value_array[idx++] = (feature.NoseLValueL);
-            value_array[idx++] = (feature.NoseLValueR);
-            value_array[idx++] = (feature.MouthLValueL);
-            value_array[idx++] = (feature.MouthLValueR);
+//            value_array[idx++] = (feature.NoseLValueR);
+//            value_array[idx++] = (feature.MouthLValueL);
+//            value_array[idx++] = (feature.MouthLValueR);
         }
         public CvSVM svm { get; set; }
     }
