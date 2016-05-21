@@ -95,15 +95,31 @@ namespace MakeSVMFile
             SetFeatureToArray(feature, ref feature_array);
             CvMat dataMat = new CvMat(1, 2, MatrixType.F32C1, feature_array, true);
 
-            //学習ファイルを読み込む
-            svm.Load(@"SvmLearning.xml");
+            //学習ファイルを読み込んでいなかったらロード
+            if (this.LoadFlag == false)
+            {
+                svm.Load(@"SvmLearning.xml");
+                this.LoadFlag = true;
+            }
 
             return (int)this.svm.Predict(dataMat);
         }
 
-
-        private void MakeFeature()
+        private int MakeFeature(double x,double y)
         {
+            double[] feature_array = new double[2];
+            feature_array[0] = x;
+            feature_array[1] = y;
+            CvMat dataMat = new CvMat(1, 2, MatrixType.F32C1, feature_array, true);
+
+            //学習ファイルを読み込む
+            if (this.LoadFlag == false )
+            {
+                svm.Load(@"SvmLearning.xml");
+                this.LoadFlag = true;
+            }
+
+            return (int)this.svm.Predict(dataMat);
 
         }
 
@@ -147,5 +163,6 @@ namespace MakeSVMFile
 //            value_array[idx++] = (feature.MouthLValueR);
         }
         public CvSVM svm { get; set; }
+        private bool LoadFlag = false;
     }
 }

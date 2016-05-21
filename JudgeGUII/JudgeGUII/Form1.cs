@@ -128,7 +128,7 @@ namespace JudgeGUII
             }
 
             InputDataModel idm = new InputDataModel();
-
+            
             //ファイルの数だけ実行
             foreach (String file_name in this.InputFileNameList)
             {
