@@ -49,12 +49,6 @@ namespace MakeSVMFile
             }
 
 
-
-            //正規化する0～１．０に収まるようにする
-            //全部２で割る？最大値がだいたい１．６くらいのはずなので
-            dataMat /= 2.0;
-
-
             //正規化後の値
             using (StreamWriter w = new StreamWriter(@"debug_Feature_Normalaize.csv"))
             {
@@ -69,6 +63,39 @@ namespace MakeSVMFile
                 }
             }
 
+            //学習データを図に
+                        // dataとresponsesの様子を描画
+            CvPoint2D32f[] points = new CvPoint2D32f[feature_array.Length];
+            int idx = 0;
+            for (int i = 0; i < feature_array.Length/2;i++ )
+            {
+                points[idx].X = (float)feature_array[i * 2];
+                points[idx].Y = (float)feature_array[i * 2 + 1];
+                idx++;
+            }
+
+                using (IplImage pointsPlot = Cv.CreateImage(new CvSize(300, 300), BitDepth.U8, 3))
+                {
+                    pointsPlot.Zero();
+                    for (int i = 0; i < id_array.Length; i++)
+                    {
+                        int x = (int)(points[i].X * 300);
+                        int y = (int)(300 - points[i].Y * 300);
+                        int res = id_array[i];
+                        //                    CvColor color = (res == 1) ? CvColor.Red : CvColor.GreenYellow;
+                        CvColor color = new CvColor();
+                        if (res == 1)
+                        {
+                            color = CvColor.Red;
+                        }
+                        else if (res == 2)
+                        {
+                            color = CvColor.GreenYellow;
+                        }
+                        pointsPlot.Circle(x, y, 2, color, -1);
+                    }
+                    CvWindow.ShowImages(pointsPlot);
+                }
             //SVMの用意
             CvTermCriteria criteria = new CvTermCriteria(1000, 0.000001);
             CvSVMParams param = new CvSVMParams(
@@ -86,6 +113,25 @@ namespace MakeSVMFile
             //学習実行
             svm.Train(dataMat, resMat, null, null, param);
 
+            SVMManage SVMManage = new SVMManage();
+            using (IplImage retPlot = new IplImage(300, 300, BitDepth.U8, 3))
+            {
+                for (int x = 0; x < 300; x++)
+                {
+                    for (int y = 0; y < 300; y++)
+                    {
+                        float[] sample = { x / 300f, y / 300f };
+                        CvMat sampleMat = new CvMat(1, 2, MatrixType.F32C1, sample);
+                        int ret = (int)svm.Predict(sampleMat);
+                        CvRect plotRect = new CvRect(x, 300 - y, 1, 1);
+                        if (ret == 1)
+                            retPlot.Rectangle(plotRect, CvColor.Red);
+                        else if (ret == 2)
+                            retPlot.Rectangle(plotRect, CvColor.GreenYellow);
+                    }
+                }
+                CvWindow.ShowImages(retPlot);
+            }
         }
 
         //SVM判定
@@ -105,8 +151,7 @@ namespace MakeSVMFile
             return (int)this.svm.Predict(dataMat);
         }
 
-        //学習ファイルのテスト用
-        public int CheckSVMPredict(double x, double y)
+        private int MakeFeature(double x,double y)
         {
             double[] feature_array = new double[2];
             feature_array[0] = x;
