@@ -25,7 +25,15 @@ namespace MakeSVMFile
 
             //特徴量をSVMで扱えるように配列に置き換える
             SetFeatureListToArray(FeatureList,ref feature_array);
-            CvMat dataMat = new CvMat(feature_array.Length / 2, 2, MatrixType.F32C1, feature_array, true);
+            CvPoint2D32f[] feature_points = new CvPoint2D32f[feature_array.Length/2];
+            int id = 0;
+            for (int i = 0; i < feature_array.Length / 2; i++)
+            {
+                feature_points[id].X = (float)feature_array[i * 2];
+                feature_points[id].Y = (float)feature_array[i * 2 + 1];
+                id++;
+            }
+            CvMat dataMat = new CvMat(feature_points.Length, 2, MatrixType.F32C1, feature_points, true);
 
             //これがラベル番号
             int[] id_array = new int[FeatureList.Count];
