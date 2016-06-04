@@ -43,39 +43,22 @@ namespace MakeSVMFile
             }
             CvMat resMat = new CvMat(id_array.Length, 1, MatrixType.S32C1, id_array, true);
 
+
+            // dataとresponsesの様子を描画
+            CvPoint2D32f[] points = new CvPoint2D32f[id_array.Length];
+            int idx = 0;
+            for (int i = 0; i < id_array.Length; i++)
+            {
+                points[idx].X = (float)feature_array[i * 2];
+                points[idx].Y = (float)feature_array[i * 2 + 1];
+                idx++;
+            }
+
+            //学習データを図にする
+            Debug_DrawInputFeature(points, id_array);
+
             //デバッグ用　学習させる特徴量を出力する
-            using (StreamWriter w = new StreamWriter(@"debug_Feature.csv"))
-            {
-                for (int i = 0; i < id_array.Length; i++ )
-                {
-                    for (int fi = 0; fi < 2; fi++)
-                    {
-                        w.Write(feature_array[i*2 +fi] + ",");
-                    }
-                    w.Write(id_array[i] + "\n");
-                }
-            }
-
-
-
-            //正規化する0～１．０に収まるようにする
-            //全部２で割る？最大値がだいたい１．６くらいのはずなので
-            dataMat /= 2.0;
-
-
-            //正規化後の値
-            using (StreamWriter w = new StreamWriter(@"debug_Feature_Normalaize.csv"))
-            {
-                for (int i = 0; i < id_array.Length; i++)
-                {
-                    for (int fi = 0; fi < 2; fi++)
-                    {
-                        double ans = feature_array[i * 2 + fi] / 2.0;
-                        w.Write( ans+ ",");
-                    }
-                    w.Write(id_array[i] + "\n");
-                }
-            }
+            OutPut_FeatureAndID(points, id_array);
 
             //SVMの用意
             CvTermCriteria criteria = new CvTermCriteria(1000, 0.000001);
@@ -83,9 +66,9 @@ namespace MakeSVMFile
                 SVMType.CSvc,
                 SVMKernelType.Rbf,
                 10.0,  // degree
-                8096.0,  // gamma        調整
+                100.0,  // gamma        調整
                 1.0, // coeff0
-                8096.0, // c               調整
+                10.0, // c               調整
                 0.5, // nu
                 0.1, // p
                 null,
@@ -93,6 +76,9 @@ namespace MakeSVMFile
 
             //学習実行
             svm.Train(dataMat, resMat, null, null, param);
+
+
+            Debug_DispPredict();
 
         }
 
@@ -103,15 +89,108 @@ namespace MakeSVMFile
             SetFeatureToArray(feature, ref feature_array);
             CvMat dataMat = new CvMat(1, 2, MatrixType.F32C1, feature_array, true);
 
-            //学習ファイルを読み込む
-            svm.Load(@"SvmLearning_EyeLandMounth.xml");
+            //学習ファイルを読み込んでいなかったらロード
+            if (this.LoadFlag == false)
+            {
+                svm.Load(@"SvmLearning.xml");
+                this.LoadFlag = true;
+            }
 
             return (int)this.svm.Predict(dataMat);
         }
 
+        //--------------------------------------------------------------------------------------
+        // private 
+        //---------------------------------------------------------------------------------------
 
-        private void MakeFeature()
+        private void Debug_DispPredict()
         {
+            using (IplImage retPlot = new IplImage(300, 300, BitDepth.U8, 3))
+            {
+                for (int x = 0; x < 300; x++)
+                {
+                    for (int y = 0; y < 300; y++)
+                    {
+                        float[] sample = { x / 300f, y / 300f };
+                        CvMat sampleMat = new CvMat(1, 2, MatrixType.F32C1, sample);
+                        int ret = (int)svm.Predict(sampleMat);
+                        CvRect plotRect = new CvRect(x, 300 - y, 1, 1);
+                        if (ret == 1)
+                            retPlot.Rectangle(plotRect, CvColor.Red);
+                        else if (ret == 2)
+                            retPlot.Rectangle(plotRect, CvColor.GreenYellow);
+                    }
+                }
+                CvWindow.ShowImages(retPlot);
+            }
+
+        }
+
+        /// <summary>
+        /// 特徴量を外部に出力する
+        /// </summary>
+        /// <param name="points"></param>
+        /// <param name="id_array"></param>
+        private void OutPut_FeatureAndID(CvPoint2D32f[] points, int[] id_array)
+        {
+            using (StreamWriter w = new StreamWriter(@"debug_Feature.csv"))
+            {
+                for (int i = 0; i < id_array.Length; i++)
+                {
+                    w.Write(points[i].X + ",");
+                    w.Write(points[i].Y + ",");
+                    w.Write(id_array[i] + "\n");
+                }
+            }
+        }
+
+        /// <summary>
+        /// 入力特徴量を図にする
+        /// </summary>
+        /// <param name="data_array"></param>
+        private void Debug_DrawInputFeature(CvPoint2D32f[] points,int[] id_array)
+        {
+            using (IplImage pointsPlot = Cv.CreateImage(new CvSize(300, 300), BitDepth.U8, 3))
+            {
+                pointsPlot.Zero();
+                for (int i = 0; i < id_array.Length; i++)
+                {
+                    int x = (int)(points[i].X * 300);
+                    int y = (int)(300 - points[i].Y * 300);
+                    int res = id_array[i];
+                    //                    CvColor color = (res == 1) ? CvColor.Red : CvColor.GreenYellow;
+                    CvColor color = new CvColor();
+                    if (res == 1)
+                    {
+                        color = CvColor.Red;
+                    }
+                    else if (res == 2)
+                    {
+                        color = CvColor.GreenYellow;
+                    }
+                    pointsPlot.Circle(x, y, 2, color, -1);
+                }
+                CvWindow.ShowImages(pointsPlot);
+            }
+
+        }
+
+
+        private int MakeFeature(double x,double y)
+        {
+            double[] feature_array = new double[2];
+            feature_array[0] = x;
+            feature_array[1] = y;
+            CvMat dataMat = new CvMat(1, 2, MatrixType.F32C1, feature_array, true);
+
+            //学習ファイルを読み込む
+            if (this.LoadFlag == false )
+            {
+                svm.Load(@"SvmLearning.xml");
+                this.LoadFlag = true;
+            }
+
+            return (int)this.svm.Predict(dataMat);
 
         }
 
@@ -155,5 +234,6 @@ namespace MakeSVMFile
 //            value_array[idx++] = (feature.MouthLValueR);
         }
         public CvSVM svm { get; set; }
+        private bool LoadFlag = false;
     }
 }

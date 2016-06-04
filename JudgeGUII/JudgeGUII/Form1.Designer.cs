@@ -31,6 +31,7 @@
             this.buttonStart = new System.Windows.Forms.Button();
             this.buttonReadList = new System.Windows.Forms.Button();
             this.labelName = new System.Windows.Forms.Label();
+            this.buttonSVMCheck = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // buttonStart
@@ -46,7 +47,7 @@
             // buttonReadList
             // 
             this.buttonReadList.Font = new System.Drawing.Font("メイリオ", 14.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
-            this.buttonReadList.Location = new System.Drawing.Point(113, 147);
+            this.buttonReadList.Location = new System.Drawing.Point(183, 31);
             this.buttonReadList.Name = "buttonReadList";
             this.buttonReadList.Size = new System.Drawing.Size(159, 81);
             this.buttonReadList.TabIndex = 2;
@@ -64,11 +65,23 @@
             this.labelName.TabIndex = 3;
             this.labelName.Text = "file_name";
             // 
+            // buttonSVMCheck
+            // 
+            this.buttonSVMCheck.Font = new System.Drawing.Font("メイリオ", 14.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
+            this.buttonSVMCheck.Location = new System.Drawing.Point(363, 31);
+            this.buttonSVMCheck.Name = "buttonSVMCheck";
+            this.buttonSVMCheck.Size = new System.Drawing.Size(159, 81);
+            this.buttonSVMCheck.TabIndex = 4;
+            this.buttonSVMCheck.Text = "学習ファイルチェック";
+            this.buttonSVMCheck.UseVisualStyleBackColor = true;
+            this.buttonSVMCheck.Click += new System.EventHandler(this.buttonSVMCheck_Click);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(284, 311);
+            this.ClientSize = new System.Drawing.Size(544, 330);
+            this.Controls.Add(this.buttonSVMCheck);
             this.Controls.Add(this.labelName);
             this.Controls.Add(this.buttonReadList);
             this.Controls.Add(this.buttonStart);
@@ -84,6 +97,7 @@
         private System.Windows.Forms.Button buttonStart;
         private System.Windows.Forms.Button buttonReadList;
         private System.Windows.Forms.Label labelName;
+        private System.Windows.Forms.Button buttonSVMCheck;
     }
 }
 
