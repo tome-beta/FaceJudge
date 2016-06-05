@@ -137,9 +137,10 @@ namespace MakeSVMFile
             {
                 for (int i = 0; i < id_array.Length; i++)
                 {
-                    w.Write(points[i].X + ",");
-                    w.Write(points[i].Y + ",");
-                    w.Write(id_array[i] + "\n");
+                    w.Write(id_array[i] + " ");
+                    w.Write("1:" +points[i].X + " ");
+                    w.Write("2:" +points[i].Y + " ");
+                    w.Write("\n");
                 }
             }
         }
