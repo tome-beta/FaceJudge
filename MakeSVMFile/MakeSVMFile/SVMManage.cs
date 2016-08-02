@@ -6,6 +6,8 @@ using System.Threading.Tasks;
 using OpenCvSharp;
 using OpenCvSharp.CPlusPlus;
 using System.IO;
+using LibSVMsharp;
+using LibSVMsharp.Helpers;
 
 namespace MakeSVMFile
 {
@@ -60,23 +62,34 @@ namespace MakeSVMFile
             //デバッグ用　学習させる特徴量を出力する
             OutPut_FeatureAndID(points, id_array);
 
-            //SVMの用意
+            SVMProblem problem = SVMProblemHelper.Load(@"debug_Feature.csv"); // これがよくない？
+
+                                                                              //            SVMProblem testProblem = SVMProblemHelper.Load(@"debug_Feature.csv");
+                                                                              /*
+                                                                                          SVMParameter parameter = new SVMParameter();
+                                                                                          parameter.Type = LibSVMsharp.SVMType.C_SVC;
+                                                                                          parameter.Kernel = LibSVMsharp.SVMKernelType.RBF;
+                                                                                          parameter.C = 1;
+                                                                                          parameter.Gamma = 1;
+
+                                                                                          SVMModel model = SVM.Train(problem, parameter);
+                                                                              */
+                                                                              //SVMの用意
             CvTermCriteria criteria = new CvTermCriteria(1000, 0.000001);
-            CvSVMParams param = new CvSVMParams(
-                SVMType.CSvc,
-                SVMKernelType.Rbf,
-                10.0,  // degree
-                100.0,  // gamma        調整
-                1.0, // coeff0
-                10.0, // c               調整
-                0.5, // nu
-                0.1, // p
-                null,
-                criteria);
+                        CvSVMParams param = new CvSVMParams(
+                            OpenCvSharp.CPlusPlus.SVMType.CSvc,
+                            OpenCvSharp.CPlusPlus.SVMKernelType.Rbf,
+                            10.0,  // degree
+                            100.0,  // gamma        調整
+                            1.0, // coeff0
+                            10.0, // c               調整
+                            0.5, // nu
+                            0.1, // p
+                            null,
+                            criteria);
 
-            //学習実行
-            svm.Train(dataMat, resMat, null, null, param);
-
+                        //学習実行
+                        svm.Train(dataMat, resMat, null, null, param);
 
             Debug_DispPredict();
 
