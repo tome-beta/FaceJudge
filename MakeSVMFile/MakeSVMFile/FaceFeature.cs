@@ -79,9 +79,9 @@ namespace MakeSVMFile
         /// <param name="file_name"></param>
         public  void MakeFeatureFromIpl(IplImage ipl_image, int face_id)
         {
-            string eye_cascade_xml = @"C:\opencv2.4.8\sources\data\haarcascades\haarcascade_eye.xml";
-            string nose_cascade_xml = @"C:\opencv2.4.8\sources\data\haarcascades\haarcascade_mcs_nose.xml";
-            string mouth_cascade_xml = @"C:\opencv2.4.8\sources\data\haarcascades\haarcascade_mcs_mouth.xml";
+            string eye_cascade_xml = @"C:\opencv2.4.10\sources\data\haarcascades\haarcascade_eye.xml";
+            string nose_cascade_xml = @"C:\opencv2.4.10\sources\data\haarcascades\haarcascade_mcs_nose.xml";
+            string mouth_cascade_xml = @"C:\opencv2.4.10\sources\data\haarcascades\haarcascade_mcs_mouth.xml";
 
             CvMemStorage strage = new CvMemStorage(0);   // メモリを確保
             CvHaarClassifierCascade eye_cascade = CvHaarClassifierCascade.FromFile(eye_cascade_xml);
