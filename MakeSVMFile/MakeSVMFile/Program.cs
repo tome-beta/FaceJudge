@@ -38,7 +38,7 @@ namespace MakeSVMFile
 
             //学習実行
             SVMManage svm_manage = new SVMManage();
-            svm_manage.LearningExec(face_feature.FeatuerValueList);
+            svm_manage.TrainingExec(face_feature.FeatuerValueList);
 
             //学習ファイルをxmlに書き出す
             String xml_name = @"SvmLearning.xml";

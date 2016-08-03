@@ -75,10 +75,6 @@
     <Prefer32Bit>true</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="LibSVMsharp, Version=1.0.0.0, Culture=neutral, processorArchitecture=x86">
-      <HintPath>..\packages\LibSVMsharp.1.2.4\lib\net45\LibSVMsharp.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
     <Reference Include="OpenCvSharp">
       <HintPath>..\packages\OpenCvSharp-AnyCPU.2.4.10.20160316\lib\net45\OpenCvSharp.dll</HintPath>
       <Private>True</Private>
@@ -113,17 +109,33 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="FaceFeature.cs" />
+    <Compile Include="libSVM\Core\libsvm.cs" />
+    <Compile Include="libSVM\Core\svm_model.cs" />
+    <Compile Include="libSVM\Core\svm_node.cs" />
+    <Compile Include="libSVM\Core\svm_parameter.cs" />
+    <Compile Include="libSVM\Core\svm_problem.cs" />
+    <Compile Include="libSVM\Extensions\SVMModelExtensions.cs" />
+    <Compile Include="libSVM\Extensions\SVMNodeExtensions.cs" />
+    <Compile Include="libSVM\Extensions\SVMProblemExtensions.cs" />
+    <Compile Include="libSVM\Helpers\SVMHelper.cs" />
+    <Compile Include="libSVM\Helpers\SVMNodeHelper.cs" />
+    <Compile Include="libSVM\Helpers\SVMProblemHelper.cs" />
+    <Compile Include="libSVM\SVM.cs" />
+    <Compile Include="libSVM\SVMModel.cs" />
+    <Compile Include="libSVM\SVMNode.cs" />
+    <Compile Include="libSVM\SVMParameter.cs" />
+    <Compile Include="libSVM\SVMProblem.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SVMManage.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
-    <None Include="LIBSVM_COPYRIGHT" />
     <None Include="packages.config" />
   </ItemGroup>
+  <ItemGroup />
   <ItemGroup>
-    <Content Include="libsvm.dll" />
+    <Content Include="libSVM\libsvm.dll" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
