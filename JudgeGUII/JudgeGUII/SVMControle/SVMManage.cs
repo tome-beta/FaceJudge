@@ -64,8 +64,8 @@ namespace MakeSVMFile
 
             //LibSVMのテスト
             //学習用のデータの読み込み
-            SVMProblem problem = SVMProblemHelper.Load(@"wine.txt");
-            SVMProblem testProblem = SVMProblemHelper.Load(@"wine.txt");
+            SVMProblem problem = SVMProblemHelper.Load(@"debug_Feature.csv");
+            SVMProblem testProblem = SVMProblemHelper.Load(@"debug_Feature.csv");
 
             SVMParameter parameter = new SVMParameter();
             parameter.Type = LibSVMsharp.SVMType.C_SVC;

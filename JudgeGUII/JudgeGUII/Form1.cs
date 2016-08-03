@@ -111,6 +111,90 @@ namespace JudgeGUII
             }
         }
 
+        //リストから学習を行う
+        private void buttonTrainFile_Click(object sender, EventArgs e)
+        {
+            //ファイルを選択
+            OpenFileDialog ofd = new OpenFileDialog();
+
+            //はじめのファイル名を指定する
+            //はじめに「ファイル名」で表示される文字列を指定する
+            ofd.FileName = "";
+            //はじめに表示されるフォルダを指定する
+            //指定しない（空の文字列）の時は、現在のディレクトリが表示される
+            ofd.InitialDirectory = @"";
+            //[ファイルの種類]に表示される選択肢を指定する
+            //指定しないとすべてのファイルが表示される
+            ofd.Filter =
+                "学習用ファイルリスト|*.txt";
+            //[ファイルの種類]ではじめに
+            //「すべてのファイル」が選択されているようにする
+            ofd.FilterIndex = 2;
+            //タイトルを設定する
+            ofd.Title = "判定する画像ファイルを選択して下さい";
+            ofd.RestoreDirectory = true;
+            ofd.CheckFileExists = true;
+            ofd.CheckPathExists = true;
+
+            //ダイアログを表示する
+            if (ofd.ShowDialog() == DialogResult.OK)
+            {
+
+            }
+
+            //出力用のフォルダを設定する
+            InputFileList = ofd.FileName;
+            OutPutFolda = @"D:\myprog\github\svm_out"; // 仮設定
+
+            //学習するファイルを読み込む
+            ReadFileList();
+
+            FaceFeature face_feature = new FaceFeature();
+            face_feature.FaceList = this.FaceList;
+            face_feature.IDList = this.IDList;
+            face_feature.OutPutFolda = this.OutPutFolda;
+
+            //特徴点を出す
+            face_feature.DetectFacePoint();
+
+            //学習実行
+            SVMManage svm_manage = new SVMManage();
+            svm_manage.TrainingExec(face_feature.FeatuerValueList);
+
+            //学習ファイルをxmlに書き出す
+            String xml_name = @"SvmLearning.xml";
+            svm_manage.svm.Save(xml_name);
+
+            //エラー表示
+            MessageBox.Show("SvmLearning.xmlを作成しました",
+            "完了",
+            MessageBoxButtons.OK
+            );
+
+        }
+
+        //顔写真リストファイルを読み込み
+        private void ReadFileList()
+        {
+            string read_list = @"";
+            read_list = this.InputFileList;
+            //リストファイルと読みこんでファイル名をとる
+            using (StreamReader sr = new StreamReader(read_list))
+            {
+                //1行づつ読み込む
+                while (sr.Peek() > -1)
+                {
+                    // カンマ区切りで分割して配列に格納する
+                    string[] stArrayData = sr.ReadLine().Split(',');
+
+                    this.FaceList.Add(stArrayData[0]);
+                    this.IDList.Add(int.Parse(stArrayData[1]));
+                }
+                //閉じる
+                sr.Close();
+            }
+        }
+
         private void ExecFromList(String input_file_name)
         {
             //エラー処理 TODO
@@ -159,25 +243,28 @@ namespace JudgeGUII
         //デバッグ用　学習ファイルを確認する
         private void buttonSVMCheck_Click(object sender, EventArgs e)
         {
-            SVMManage SVMManage = new SVMManage();
-            using (IplImage retPlot = new IplImage(300, 300, BitDepth.U8, 3))
-            {
-                for (int x = 0; x < 300; x++)
-                {
-                    for (int y = 0; y < 300; y++)
-                    {
-                        double xx = (double)x / 300.0;
-                        double yy = (double)y / 300.0;
-                        int ret = (int)SVMManage.CheckSVMPredict(xx, yy);
-                        CvRect plotRect = new CvRect(x, 300 - y, 1, 1);
-                        if (ret == 1)
-                            retPlot.Rectangle(plotRect, CvColor.Red);
-                        else if (ret == 2)
-                            retPlot.Rectangle(plotRect, CvColor.GreenYellow);
-                    }
-                }
-                CvWindow.ShowImages(retPlot);
-            }
+            //一時停止
+            /*
+                        SVMManage SVMManage = new SVMManage();
+                        using (IplImage retPlot = new IplImage(300, 300, BitDepth.U8, 3))
+                        {
+                            for (int x = 0; x < 300; x++)
+                            {
+                                for (int y = 0; y < 300; y++)
+                                {
+                                    double xx = (double)x / 300.0;
+                                    double yy = (double)y / 300.0;
+                                    int ret = (int)SVMManage.CheckSVMPredict(xx, yy);
+                                    CvRect plotRect = new CvRect(x, 300 - y, 1, 1);
+                                    if (ret == 1)
+                                        retPlot.Rectangle(plotRect, CvColor.Red);
+                                    else if (ret == 2)
+                                        retPlot.Rectangle(plotRect, CvColor.GreenYellow);
+                                }
+                            }
+                            CvWindow.ShowImages(retPlot);
+                        }
+            */
         }
 
 
@@ -185,6 +272,12 @@ namespace JudgeGUII
 
         List<String> InputFileNameList = new List<string>();
         List<int> PredictResultList = new List<int>();
+
+        //学習用の変数
+        String InputFileList = @"";
+        String OutPutFolda = @"";
+        List<string> FaceList = new List<string>();
+        List<int> IDList = new List<int>();//特徴量とセットで使うID
 
     }
 }

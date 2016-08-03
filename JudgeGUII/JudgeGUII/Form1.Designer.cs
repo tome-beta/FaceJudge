@@ -32,6 +32,7 @@
             this.buttonReadList = new System.Windows.Forms.Button();
             this.labelName = new System.Windows.Forms.Label();
             this.buttonSVMCheck = new System.Windows.Forms.Button();
+            this.buttonTrainFile = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // buttonStart
@@ -76,11 +77,23 @@
             this.buttonSVMCheck.UseVisualStyleBackColor = true;
             this.buttonSVMCheck.Click += new System.EventHandler(this.buttonSVMCheck_Click);
             // 
+            // buttonTrainFile
+            // 
+            this.buttonTrainFile.Font = new System.Drawing.Font("メイリオ", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
+            this.buttonTrainFile.Location = new System.Drawing.Point(532, 188);
+            this.buttonTrainFile.Name = "buttonTrainFile";
+            this.buttonTrainFile.Size = new System.Drawing.Size(200, 73);
+            this.buttonTrainFile.TabIndex = 5;
+            this.buttonTrainFile.Text = "学習ファイルの作成";
+            this.buttonTrainFile.UseVisualStyleBackColor = true;
+            this.buttonTrainFile.Click += new System.EventHandler(this.buttonTrainFile_Click);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(544, 330);
+            this.ClientSize = new System.Drawing.Size(762, 363);
+            this.Controls.Add(this.buttonTrainFile);
             this.Controls.Add(this.buttonSVMCheck);
             this.Controls.Add(this.labelName);
             this.Controls.Add(this.buttonReadList);
@@ -98,6 +111,7 @@
         private System.Windows.Forms.Button buttonReadList;
         private System.Windows.Forms.Label labelName;
         private System.Windows.Forms.Button buttonSVMCheck;
+        private System.Windows.Forms.Button buttonTrainFile;
     }
 }
 

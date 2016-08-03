@@ -85,22 +85,24 @@
     <Compile Include="InputDataModel.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="SVM\libSVM\libsvm.cs" />
-    <Compile Include="SVM\libSVM\SVM.cs" />
-    <Compile Include="SVM\libSVM\SVMHelper.cs" />
-    <Compile Include="SVM\libSVM\SVMModel.cs" />
-    <Compile Include="SVM\libSVM\SVMModelExtensions.cs" />
-    <Compile Include="SVM\libSVM\SVMNode.cs" />
-    <Compile Include="SVM\libSVM\SVMNodeExtensions.cs" />
-    <Compile Include="SVM\libSVM\SVMNodeHelper.cs" />
-    <Compile Include="SVM\libSVM\SVMParameter.cs" />
-    <Compile Include="SVM\libSVM\SVMProblem.cs" />
-    <Compile Include="SVM\libSVM\SVMProblemExtensions.cs" />
-    <Compile Include="SVM\libSVM\SVMProblemHelper.cs" />
-    <Compile Include="SVM\libSVM\svm_model.cs" />
-    <Compile Include="SVM\libSVM\svm_node.cs" />
-    <Compile Include="SVM\libSVM\svm_parameter.cs" />
-    <Compile Include="SVM\libSVM\svm_problem.cs" />
+    <Compile Include="SVMControle\FaceFeature.cs" />
+    <Compile Include="SVMControle\libSVM\Core\libsvm.cs" />
+    <Compile Include="SVMControle\libSVM\Core\svm_model.cs" />
+    <Compile Include="SVMControle\libSVM\Core\svm_node.cs" />
+    <Compile Include="SVMControle\libSVM\Core\svm_parameter.cs" />
+    <Compile Include="SVMControle\libSVM\Core\svm_problem.cs" />
+    <Compile Include="SVMControle\libSVM\Extensions\SVMModelExtensions.cs" />
+    <Compile Include="SVMControle\libSVM\Extensions\SVMNodeExtensions.cs" />
+    <Compile Include="SVMControle\libSVM\Extensions\SVMProblemExtensions.cs" />
+    <Compile Include="SVMControle\libSVM\Helpers\SVMHelper.cs" />
+    <Compile Include="SVMControle\libSVM\Helpers\SVMNodeHelper.cs" />
+    <Compile Include="SVMControle\libSVM\Helpers\SVMProblemHelper.cs" />
+    <Compile Include="SVMControle\libSVM\SVM.cs" />
+    <Compile Include="SVMControle\libSVM\SVMModel.cs" />
+    <Compile Include="SVMControle\libSVM\SVMNode.cs" />
+    <Compile Include="SVMControle\libSVM\SVMParameter.cs" />
+    <Compile Include="SVMControle\libSVM\SVMProblem.cs" />
+    <Compile Include="SVMControle\SVMManage.cs" />
     <EmbeddedResource Include="Form1.resx">
       <DependentUpon>Form1.cs</DependentUpon>
     </EmbeddedResource>
@@ -126,6 +128,9 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="SVMControle\libSVM\libsvm.dll" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
