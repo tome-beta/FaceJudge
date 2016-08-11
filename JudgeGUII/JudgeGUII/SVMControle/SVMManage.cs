@@ -76,36 +76,14 @@ namespace MakeSVMFile
 
             libSVM_model = SVM.Train(problem, parameter);
             SVM.SaveModel(libSVM_model, @"libsvm_model.xml");
-//            model = SVM.LoadModel;
             double[] target = new double[testProblem.Length];
             for (int i = 0; i < testProblem.Length; i++)
             {
                 target[i] = SVM.Predict(libSVM_model, testProblem.X[i]);
-                Console.Out.WriteLine(@"[0] : [1]",i, target[i]);
+                Console.Out.WriteLine(@"{0} : {1}",i, target[i]);
             }
             //正解率を出す。
             double accuracy = SVMHelper.EvaluateClassificationProblem(testProblem, target);
-
-            /*            
-                        //SVMの用意
-                        CvTermCriteria criteria = new CvTermCriteria(1000, 0.000001);
-                                    CvSVMParams param = new CvSVMParams(
-                                        OpenCvSharp.CPlusPlus.SVMType.CSvc,
-                                        OpenCvSharp.CPlusPlus.SVMKernelType.Rbf,
-                                        10.0,  // degree
-                                        100.0,  // gamma        調整
-                                        1.0, // coeff0
-                                        10.0, // c               調整
-                                        0.5, // nu
-                                        0.1, // p
-                                        null,
-                                        criteria);
-
-                        //学習実行
-                        svm.Train(dataMat, resMat, null, null, param);
-                        Debug_DispPredict();
-            */
-
         }
 
         //SVM判定
@@ -125,22 +103,19 @@ namespace MakeSVMFile
             if (this.LoadFlag == false)
             {
                 this.libSVM_model= SVM.LoadModel(@"libsvm_model.xml");
-               // svm.Load(@"SvmLearning.xml");
                 this.LoadFlag = true;
             }
 
-            //            return (int)this.svm.Predict(dataMat);
             return (int)SVM.Predict(libSVM_model,node_array);
         }
 
-        //--------------------------------------------------------------------------------------
-        // private 
-        //---------------------------------------------------------------------------------------
-
         //作成した辞書を図でみる
-        private void Debug_DispPredict()
+        public void Debug_DispPredict()
         {
-/*
+            //辞書ファイルのロード
+            this.libSVM_model = SVM.LoadModel(@"libsvm_model.xml");
+
+
             using (IplImage retPlot = new IplImage(300, 300, BitDepth.U8, 3))
             {
                 for (int x = 0; x < 300; x++)
@@ -148,8 +123,12 @@ namespace MakeSVMFile
                     for (int y = 0; y < 300; y++)
                     {
                         float[] sample = { x / 300f, y / 300f };
-                        CvMat sampleMat = new CvMat(1, 2, MatrixType.F32C1, sample);
-                        int ret = (int)svm.Predict(sampleMat);
+                        //問題を作成
+                        SVMNode[] node_array = new SVMNode[2];
+                        node_array[0] = new SVMNode(0, sample[0]);
+                        node_array[1] = new SVMNode(1, sample[1]);
+                        int ret = (int)SVM.Predict(libSVM_model, node_array);
+
                         CvRect plotRect = new CvRect(x, 300 - y, 1, 1);
                         if (ret == 1)
                             retPlot.Rectangle(plotRect, CvColor.Red);
@@ -159,8 +138,12 @@ namespace MakeSVMFile
                 }
                 CvWindow.ShowImages(retPlot);
             }
-*/
         }
+
+
+        //--------------------------------------------------------------------------------------
+        // private 
+        //---------------------------------------------------------------------------------------
 
         /// <summary>
         /// 特徴量を外部に出力する
