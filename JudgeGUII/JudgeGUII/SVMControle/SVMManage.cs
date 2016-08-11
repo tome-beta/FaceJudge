@@ -70,38 +70,40 @@ namespace MakeSVMFile
             SVMParameter parameter = new SVMParameter();
             parameter.Type = LibSVMsharp.SVMType.C_SVC;
             parameter.Kernel = LibSVMsharp.SVMKernelType.RBF;
-            parameter.C = 1;
-            parameter.Gamma = 1;
+            parameter.C = 10;
+            parameter.Gamma = 100;
 
             SVMModel model = SVM.Train(problem, parameter);
+            SVM.SaveModel(model,@"lisvm_model.xml");
+//            model = SVM.LoadModel;
             double[] target = new double[testProblem.Length];
-
-
-             for (int i = 0; i < testProblem.Length; i++)
+            for (int i = 0; i < testProblem.Length; i++)
             {
                 target[i] = SVM.Predict(model, testProblem.X[i]);
+                Console.Out.WriteLine(@"%d : %d",i, target[i]);
             }
+            //正解率を出す。
             double accuracy = SVMHelper.EvaluateClassificationProblem(testProblem, target);
 
-            
-            //SVMの用意
-            CvTermCriteria criteria = new CvTermCriteria(1000, 0.000001);
-                        CvSVMParams param = new CvSVMParams(
-                            OpenCvSharp.CPlusPlus.SVMType.CSvc,
-                            OpenCvSharp.CPlusPlus.SVMKernelType.Rbf,
-                            10.0,  // degree
-                            100.0,  // gamma        調整
-                            1.0, // coeff0
-                            10.0, // c               調整
-                            0.5, // nu
-                            0.1, // p
-                            null,
-                            criteria);
+            /*            
+                        //SVMの用意
+                        CvTermCriteria criteria = new CvTermCriteria(1000, 0.000001);
+                                    CvSVMParams param = new CvSVMParams(
+                                        OpenCvSharp.CPlusPlus.SVMType.CSvc,
+                                        OpenCvSharp.CPlusPlus.SVMKernelType.Rbf,
+                                        10.0,  // degree
+                                        100.0,  // gamma        調整
+                                        1.0, // coeff0
+                                        10.0, // c               調整
+                                        0.5, // nu
+                                        0.1, // p
+                                        null,
+                                        criteria);
 
                         //学習実行
                         svm.Train(dataMat, resMat, null, null, param);
-
-            Debug_DispPredict();
+                        Debug_DispPredict();
+            */
 
         }
 
