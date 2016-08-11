@@ -34,7 +34,7 @@ namespace JudgeGUII
         private bool LoadImageFile(String file_name)
         {
             //カスケード分類器の特徴量を取得する
-            CvHaarClassifierCascade cascade = CvHaarClassifierCascade.FromFile(@"C:\opencv2.4.8\sources\data\haarcascades\haarcascade_frontalface_alt.xml");
+            CvHaarClassifierCascade cascade = CvHaarClassifierCascade.FromFile(@"C:\opencv2.4.10\sources\data\haarcascades\haarcascade_frontalface_alt.xml");
             CvMemStorage strage = new CvMemStorage(0);   // メモリを確保
             this.ImageFileName = file_name;
 
