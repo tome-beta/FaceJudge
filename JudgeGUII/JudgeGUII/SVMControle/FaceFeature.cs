@@ -89,7 +89,6 @@ namespace MakeSVMFile
             CvHaarClassifierCascade mouth_cascade = CvHaarClassifierCascade.FromFile(mouth_cascade_xml);
 
             //リストにあるファイルを一枚づつデータにする
-//            using (IplImage img = new IplImage(file_name))
             {
                 IplImage tmp_image;
                 //サイズが小さければ拡大して使う
@@ -161,6 +160,13 @@ namespace MakeSVMFile
                     this.FeatuerValueList.Add(feature_value);
                 }
             }
+
+            //メモリ解放
+            eye_cascade.Dispose();
+            nose_cascade.Dispose();
+            mouth_cascade.Dispose();
+            strage.Dispose();
+            return;
         }
 
 

@@ -15,7 +15,6 @@ namespace MakeSVMFile
     {
         public SVMManage()
         {
-///          this.svm = new CvSVM();
         }
 
         //学習ファイルの作成
@@ -27,25 +26,12 @@ namespace MakeSVMFile
 
             //特徴量をSVMで扱えるように配列に置き換える
             SetFeatureListToArray(FeatureList,ref feature_array);
-/*  
-            CvPoint2D32f[] feature_points = new CvPoint2D32f[feature_array.Length/2];
-            int id = 0;
-            for (int i = 0; i < feature_array.Length / 2; i++)
-            {
-                feature_points[id].X = (float)feature_array[i * 2];
-                feature_points[id].Y = (float)feature_array[i * 2 + 1];
-                id++;
-            }
-            CvMat dataMat = new CvMat(feature_points.Length, 2, MatrixType.F32C1, feature_points, true);
-*/
             //これがラベル番号
             int[] id_array = new int[FeatureList.Count];
             for(int i = 0; i < id_array.Length;i++)
             {
                 id_array[i] = FeatureList[i].ID;
             }
-//            CvMat resMat = new CvMat(id_array.Length, 1, MatrixType.S32C1, id_array, true);
-
 
             // dataとresponsesの様子を描画
             CvPoint2D32f[] points = new CvPoint2D32f[id_array.Length];
@@ -75,8 +61,20 @@ namespace MakeSVMFile
             parameter.Gamma = 100;
 
             libSVM_model = SVM.Train(problem, parameter);
+            //辞書ファイルを出力
             SVM.SaveModel(libSVM_model, @"libsvm_model.xml");
             double[] target = new double[testProblem.Length];
+
+            //判定結果をファイルに出してみる
+            using (StreamWriter w = new StreamWriter(@"debug_answer.csv"))
+            {
+                for (int i = 0; i < testProblem.Length; i++)
+                {
+                    target[i] = SVM.Predict(libSVM_model, testProblem.X[i]);
+                    w.Write(target[i]+"\n");
+                }
+            }
+
             for (int i = 0; i < testProblem.Length; i++)
             {
                 target[i] = SVM.Predict(libSVM_model, testProblem.X[i]);
@@ -114,7 +112,6 @@ namespace MakeSVMFile
         {
             //辞書ファイルのロード
             this.libSVM_model = SVM.LoadModel(@"libsvm_model.xml");
-
 
             using (IplImage retPlot = new IplImage(300, 300, BitDepth.U8, 3))
             {

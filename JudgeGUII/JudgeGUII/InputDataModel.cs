@@ -27,7 +27,6 @@ namespace JudgeGUII
                 //特徴量が取れなかった
                 return -1;
             }
-
         }
 
         //画像ファイルロード
@@ -67,6 +66,11 @@ namespace JudgeGUII
                         this.FaceIplList.Add(ipl_image);
                     }
                 }
+
+                //メモリ解放
+                cascade.Dispose();
+                strage.Dispose();
+
                 return true;
             }
         }
