@@ -20,6 +20,11 @@ namespace JudgeGUII
             if (FaceFeature.FeatuerValueList.Count >= 1)
             {
                 int result = SVMJudge();
+
+                //初期化
+                FaceFeature.FeatuerValueList.Clear();
+                this.FaceIplList.Clear();
+
                 return result;
             }
             else
@@ -82,6 +87,8 @@ namespace JudgeGUII
             {
                 FaceFeature.MakeFeatureFromIpl(ipl_image, 0);
             }
+
+
             return true;
         }
 
@@ -93,6 +100,7 @@ namespace JudgeGUII
             feature = FaceFeature.FeatuerValueList[0];
             double[] value = new double[2];
             int ret = this.SVMManage.SVMPredict(feature);
+
             return ret;
         }
 
