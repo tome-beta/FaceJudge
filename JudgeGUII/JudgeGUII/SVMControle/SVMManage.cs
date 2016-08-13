@@ -93,8 +93,8 @@ namespace MakeSVMFile
 
             //問題を作成
             SVMNode[] node_array = new SVMNode[2];
-            node_array[0] = new SVMNode(0, feature_array[0]);
-            node_array[1] = new SVMNode(1, feature_array[1]);
+            node_array[0] = new SVMNode(1, feature_array[0]);
+            node_array[1] = new SVMNode(2, feature_array[1]);
 
 
             //学習ファイルを読み込んでいなかったらロード
@@ -122,14 +122,14 @@ namespace MakeSVMFile
                         float[] sample = { x / 300f, y / 300f };
                         //問題を作成
                         SVMNode[] node_array = new SVMNode[2];
-                        node_array[0] = new SVMNode(0, sample[0]);
-                        node_array[1] = new SVMNode(1, sample[1]);
-                        int ret = (int)SVM.Predict(libSVM_model, node_array);
-
+                        node_array[0] = new SVMNode(1, sample[0]);
+                        node_array[1] = new SVMNode(2, sample[1]);
+                        int ret_double = (int)SVM.Predict(libSVM_model, node_array);
+                        int ret_i = (int)ret_double;
                         CvRect plotRect = new CvRect(x, 300 - y, 1, 1);
-                        if (ret == 1)
+                        if (ret_i == 1)
                             retPlot.Rectangle(plotRect, CvColor.Red);
-                        else if (ret == 2)
+                        else if (ret_i == 2)
                             retPlot.Rectangle(plotRect, CvColor.GreenYellow);
                     }
                 }

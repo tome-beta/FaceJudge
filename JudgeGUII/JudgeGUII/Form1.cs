@@ -59,6 +59,11 @@ namespace JudgeGUII
 
                 if( ret >= 0)
                 {
+                    String str = InputFileName + @" " + ret.ToString();
+                    Console.WriteLine(str);
+                    this.labelName.Text = str;
+                    labelName.Refresh();
+                    
                     //エラー表示
                     MessageBox.Show("検出完了",
                     "完了",
