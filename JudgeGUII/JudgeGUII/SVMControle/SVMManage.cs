@@ -1,10 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using OpenCvSharp;
-using OpenCvSharp.CPlusPlus;
 using System.IO;
 using LibSVMsharp;
 using LibSVMsharp.Helpers;
@@ -52,8 +48,8 @@ namespace MakeSVMFile
             //LibSVMのテスト
             //学習用のデータの読み込み
             SVMProblem problem = SVMProblemHelper.Load(@"debug_Feature.csv");
-            SVMProblem testProblem = SVMProblemHelper.Load(@"debug_Feature.csv");
 
+            //SVMパラメータ
             SVMParameter parameter = new SVMParameter();
             parameter.Type = LibSVMsharp.SVMType.C_SVC;
             parameter.Kernel = LibSVMsharp.SVMKernelType.RBF;
@@ -63,22 +59,18 @@ namespace MakeSVMFile
             libSVM_model = SVM.Train(problem, parameter);
             //辞書ファイルを出力
             SVM.SaveModel(libSVM_model, @"libsvm_model.xml");
-            double[] target = new double[testProblem.Length];
 
             //判定結果をファイルに出してみる
+            SVMProblem testProblem = SVMProblemHelper.Load(@"debug_Feature.csv");
+            double[] target = new double[testProblem.Length];
             using (StreamWriter w = new StreamWriter(@"debug_answer.csv"))
             {
                 for (int i = 0; i < testProblem.Length; i++)
                 {
                     target[i] = SVM.Predict(libSVM_model, testProblem.X[i]);
                     w.Write(target[i]+"\n");
+                    Console.Out.WriteLine(@"{0} : {1}", i, target[i]);
                 }
-            }
-
-            for (int i = 0; i < testProblem.Length; i++)
-            {
-                target[i] = SVM.Predict(libSVM_model, testProblem.X[i]);
-                Console.Out.WriteLine(@"{0} : {1}",i, target[i]);
             }
             //正解率を出す。
             double accuracy = SVMHelper.EvaluateClassificationProblem(testProblem, target);
@@ -95,7 +87,6 @@ namespace MakeSVMFile
             SVMNode[] node_array = new SVMNode[2];
             node_array[0] = new SVMNode(1, feature_array[0]);
             node_array[1] = new SVMNode(2, feature_array[1]);
-
 
             //学習ファイルを読み込んでいなかったらロード
             if (this.LoadFlag == false)
@@ -192,25 +183,6 @@ namespace MakeSVMFile
 
         }
 
-/*
-        private int MakeFeature(double x,double y)
-        {
-            double[] feature_array = new double[2];
-            feature_array[0] = x;
-            feature_array[1] = y;
-            CvMat dataMat = new CvMat(1, 2, MatrixType.F32C1, feature_array, true);
-
-            //学習ファイルを読み込む
-            if (this.LoadFlag == false )
-            {
-                svm.Load(@"SvmLearning.xml");
-                this.LoadFlag = true;
-            }
-
-            return (int)this.svm.Predict(dataMat);
-
-        }
-*/
         /// <summary>
         /// 特徴量の値を配列にセットする
         /// </summary>
@@ -250,7 +222,7 @@ namespace MakeSVMFile
 //            value_array[idx++] = (feature.MouthLValueL);
 //            value_array[idx++] = (feature.MouthLValueR);
         }
-////        public CvSVM svm { get; set; }
+
         private bool LoadFlag = false;
         public SVMModel libSVM_model { get; set; }
     }

@@ -1,11 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using OpenCvSharp;
 using MakeSVMFile;
-using System.IO;
 
 namespace JudgeGUII
 {
@@ -17,11 +13,11 @@ namespace JudgeGUII
             LoadImageFile(this.ImageFileName);  //画像読み込み＆顔切り抜き
             FeatureFromIpl();                   //顔から特徴量の算出
 
+            //画像より顔を見るけることができたら
             if (FaceFeature.FeatuerValueList.Count >= 1)
             {
-                int result = SVMJudge();
-
-                //初期化
+                int result = this.SVMManage.SVMPredict(FaceFeature.FeatuerValueList[0]);
+                //処理が終わったので初期化しておく
                 FaceFeature.FeatuerValueList.Clear();
                 this.FaceIplList.Clear();
 
@@ -87,23 +83,8 @@ namespace JudgeGUII
             {
                 FaceFeature.MakeFeatureFromIpl(ipl_image, 0);
             }
-
-
             return true;
         }
-
-        //顔判定
-        private int  SVMJudge()
-        {
-            FaceFeature.FeatureValue feature = new FaceFeature.FeatureValue();
-
-            feature = FaceFeature.FeatuerValueList[0];
-            double[] value = new double[2];
-            int ret = this.SVMManage.SVMPredict(feature);
-
-            return ret;
-        }
-
 
         //===================================
         //変数
