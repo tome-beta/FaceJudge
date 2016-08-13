@@ -59,6 +59,11 @@ namespace JudgeGUII
 
                 if( ret >= 0)
                 {
+                    String str = InputFileName + @" " + ret.ToString();
+                    Console.WriteLine(str);
+                    this.labelName.Text = str;
+                    labelName.Refresh();
+                    
                     //エラー表示
                     MessageBox.Show("検出完了",
                     "完了",
@@ -239,28 +244,8 @@ namespace JudgeGUII
         //デバッグ用　学習ファイルを確認する
         private void buttonSVMCheck_Click(object sender, EventArgs e)
         {
-            //一時停止
-            /*
-                        SVMManage SVMManage = new SVMManage();
-                        using (IplImage retPlot = new IplImage(300, 300, BitDepth.U8, 3))
-                        {
-                            for (int x = 0; x < 300; x++)
-                            {
-                                for (int y = 0; y < 300; y++)
-                                {
-                                    double xx = (double)x / 300.0;
-                                    double yy = (double)y / 300.0;
-                                    int ret = (int)SVMManage.CheckSVMPredict(xx, yy);
-                                    CvRect plotRect = new CvRect(x, 300 - y, 1, 1);
-                                    if (ret == 1)
-                                        retPlot.Rectangle(plotRect, CvColor.Red);
-                                    else if (ret == 2)
-                                        retPlot.Rectangle(plotRect, CvColor.GreenYellow);
-                                }
-                            }
-                            CvWindow.ShowImages(retPlot);
-                        }
-            */
+            SVMManage SVMManage = new SVMManage();
+            SVMManage.Debug_DispPredict();
         }
 
 

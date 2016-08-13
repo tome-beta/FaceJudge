@@ -20,6 +20,11 @@ namespace JudgeGUII
             if (FaceFeature.FeatuerValueList.Count >= 1)
             {
                 int result = SVMJudge();
+
+                //初期化
+                FaceFeature.FeatuerValueList.Clear();
+                this.FaceIplList.Clear();
+
                 return result;
             }
             else
@@ -27,7 +32,6 @@ namespace JudgeGUII
                 //特徴量が取れなかった
                 return -1;
             }
-
         }
 
         //画像ファイルロード
@@ -67,6 +71,11 @@ namespace JudgeGUII
                         this.FaceIplList.Add(ipl_image);
                     }
                 }
+
+                //メモリ解放
+                cascade.Dispose();
+                strage.Dispose();
+
                 return true;
             }
         }
@@ -78,6 +87,8 @@ namespace JudgeGUII
             {
                 FaceFeature.MakeFeatureFromIpl(ipl_image, 0);
             }
+
+
             return true;
         }
 
@@ -89,6 +100,7 @@ namespace JudgeGUII
             feature = FaceFeature.FeatuerValueList[0];
             double[] value = new double[2];
             int ret = this.SVMManage.SVMPredict(feature);
+
             return ret;
         }
 
