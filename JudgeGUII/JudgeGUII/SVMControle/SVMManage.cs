@@ -16,6 +16,12 @@ namespace MakeSVMFile
         //学習ファイルの作成
         public void TrainingExec(List<FaceFeature.FeatureValue> FeatureList)
         {
+            //３種類の学習ファイルを作る
+            makeLearinigFile(FeatureList, @"debug_Feature.csv", 0);
+
+            //学習を実行
+            Training(@"debug_Feature.csv", 0, 0);
+/*
             //特徴量をMatに移し替える　2個で一つ
             //2個のfloat * LISTの大きさの配列
             double[] feature_array = new double[2 * FeatureList.Count];
@@ -74,6 +80,7 @@ namespace MakeSVMFile
             }
             //正解率を出す。
             double accuracy = SVMHelper.EvaluateClassificationProblem(testProblem, target);
+            */
         }
 
         //SVM判定
@@ -132,6 +139,84 @@ namespace MakeSVMFile
         //--------------------------------------------------------------------------------------
         // private 
         //---------------------------------------------------------------------------------------
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="input_learing_file"></param>
+        /// <param name="gammma"></param>
+        /// <param name="cost"></param>
+        private void Training(string input_learing_file,float gammma,float cost)
+        {
+            //LibSVMのテスト
+            //学習用のデータの読み込み
+            SVMProblem problem = SVMProblemHelper.Load(input_learing_file);
+
+            //SVMパラメータ
+            SVMParameter parameter = new SVMParameter();
+            parameter.Type = LibSVMsharp.SVMType.C_SVC;
+            parameter.Kernel = LibSVMsharp.SVMKernelType.RBF;
+            parameter.C = 10;
+            parameter.Gamma = 100;
+
+            libSVM_model = SVM.Train(problem, parameter);
+            //辞書ファイルを出力
+            string xml_name = @"model_" + input_learing_file;
+            SVM.SaveModel(libSVM_model, xml_name);
+
+            //判定結果をファイルに出してみる
+            SVMProblem testProblem = SVMProblemHelper.Load(input_learing_file);
+            double[] target = new double[testProblem.Length];
+            using (StreamWriter w = new StreamWriter(@"debug_answer.csv"))
+            {
+                for (int i = 0; i < testProblem.Length; i++)
+                {
+                    target[i] = SVM.Predict(libSVM_model, testProblem.X[i]);
+                    w.Write(target[i] + "\n");
+                    Console.Out.WriteLine(@"{0} : {1}", i, target[i]);
+                }
+            }
+            //正解率を出す。
+            double accuracy = SVMHelper.EvaluateClassificationProblem(testProblem, target);
+
+            return;
+        }
+            /// <summary>
+        /// 辞書ファイルを作成する
+        /// </summary>
+        /// <param name="feature_list">特徴量</param>
+        /// <param name="file_name">辞書ファイル名</param>
+        /// <param name="type">辞書タイプ</param>
+        private void makeLearinigFile(List<FaceFeature.FeatureValue> feature_list, string file_name,int type)
+        {
+            //特徴量をMatに移し替える　2個で一つ
+            //2個のfloat * LISTの大きさの配列
+            double[] feature_array = new double[2 * feature_list.Count];
+
+            //特徴量をSVMで扱えるように配列に置き換える
+            SetFeatureListToArray(feature_list, ref feature_array);
+            //これがラベル番号
+            int[] id_array = new int[feature_list.Count];
+            for (int i = 0; i < id_array.Length; i++)
+            {
+                id_array[i] = feature_list[i].ID;
+            }
+
+            // dataとresponsesの様子を描画
+            CvPoint2D32f[] points = new CvPoint2D32f[id_array.Length];
+            int idx = 0;
+            for (int i = 0; i < id_array.Length; i++)
+            {
+                points[idx].X = (float)feature_array[i * 2];
+                points[idx].Y = (float)feature_array[i * 2 + 1];
+                idx++;
+            }
+
+            //学習データを図にする
+            Debug_DrawInputFeature(points, id_array);
+            //LibSVMで学習させるためのデータを出力
+            OutPut_FeatureAndID(points, id_array);
+        }
 
         /// <summary>
         /// 特徴量を外部に出力する
