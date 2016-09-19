@@ -11,12 +11,12 @@ namespace MakeSVMFile
     {
         const float SVM_COST = 10.0f;
         const float SVM_GAMMA = 100.0f;
-        
+
         enum LEARNING_TYPE
         {
-          L_EYE_NOSE = 0,
-          L_EYE_MOUTH,
-          R_EYE_MOUTH,
+            L_EYE_NOSE = 0,
+            L_EYE_MOUTH,
+            R_EYE_MOUTH,
         };
 
         public SVMManage()
@@ -45,23 +45,57 @@ namespace MakeSVMFile
         //SVM判定
         public int SVMPredict(FaceFeature.FeatureValue feature)
         {
-            double[] feature_array = new double[2];
-            SetFeatureToArray(feature, ref feature_array);
-            CvMat dataMat = new CvMat(1, 2, MatrixType.F32C1, feature_array, true);
-
-            //問題を作成
-            SVMNode[] node_array = new SVMNode[2];
-            node_array[0] = new SVMNode(1, feature_array[0]);
-            node_array[1] = new SVMNode(2, feature_array[1]);
-
             //学習ファイルを読み込んでいなかったらロード
             if (this.LoadFlag == false)
             {
-                this.libSVM_model= SVM.LoadModel(@"libsvm_model.xml");
+                this.libSVM_model_1 = SVM.LoadModel(@"model_Feature_L_EYE_NOSE.xml");
+                this.libSVM_model_2 = SVM.LoadModel(@"model_Feature_L_EYE_MOUTH.xml");
+                this.libSVM_model_3 = SVM.LoadModel(@"model_Feature_R_EYE_MOUTH.xml");
                 this.LoadFlag = true;
             }
 
-            return (int)SVM.Predict(libSVM_model,node_array);
+            double[] feature_array = new double[2];
+            int[] answer = new int[3];
+
+            {
+                SetFeatureToArray(feature, ref feature_array, LEARNING_TYPE.L_EYE_NOSE);
+
+                //問題を作成
+                SVMNode[] node_array = new SVMNode[2];
+                node_array[0] = new SVMNode(1, feature_array[0]);
+                node_array[1] = new SVMNode(2, feature_array[1]);
+
+                answer[0] = (int)SVM.Predict(libSVM_model_1, node_array);
+                return answer[0];
+            }
+/*
+            {
+                SetFeatureToArray(feature, ref feature_array, LEARNING_TYPE.L_EYE_MOUTH);
+
+                //問題を作成
+                SVMNode[] node_array = new SVMNode[2];
+                node_array[0] = new SVMNode(1, feature_array[0]);
+                node_array[1] = new SVMNode(2, feature_array[1]);
+
+                answer[1] = (int)SVM.Predict(libSVM_model_2, node_array);
+            }
+            {
+                SetFeatureToArray(feature, ref feature_array, LEARNING_TYPE.R_EYE_MOUTH);
+
+                //問題を作成
+                SVMNode[] node_array = new SVMNode[2];
+                node_array[0] = new SVMNode(1, feature_array[0]);
+                node_array[1] = new SVMNode(2, feature_array[1]);
+
+                answer[2] = (int)SVM.Predict(libSVM_model_2, node_array);
+            }
+*/
+
+            int final = answer[0] + answer[1] + answer[2];
+
+            if(final < 5) { final = 1; }
+            else { final = 2; }
+            return final;
         }
 
         //作成した辞書を図でみる
@@ -105,7 +139,7 @@ namespace MakeSVMFile
         /// <param name="input_learing_file"></param>
         /// <param name="gammma"></param>
         /// <param name="cost"></param>
-        private void Training(string input_learing_file,float gammma,float cost)
+        private void Training(string input_learing_file, float gammma, float cost)
         {
             //LibSVMのテスト
             //学習用のデータの読み込み
@@ -182,7 +216,7 @@ namespace MakeSVMFile
         /// </summary>
         /// <param name="points"></param>
         /// <param name="id_array"></param>
-        private void OutPut_FeatureAndID(CvPoint2D32f[] points, int[] id_array,string file_name)
+        private void OutPut_FeatureAndID(CvPoint2D32f[] points, int[] id_array, string file_name)
         {
             using (StreamWriter w = new StreamWriter(file_name))
             {
@@ -200,7 +234,7 @@ namespace MakeSVMFile
         /// 入力特徴量を図にする
         /// </summary>
         /// <param name="data_array"></param>
-        private void Debug_DrawInputFeature(CvPoint2D32f[] points,int[] id_array)
+        private void Debug_DrawInputFeature(CvPoint2D32f[] points, int[] id_array)
         {
             using (IplImage pointsPlot = Cv.CreateImage(new CvSize(300, 300), BitDepth.U8, 3))
             {
@@ -237,7 +271,7 @@ namespace MakeSVMFile
         {
             int idx = 0;
 
-            if( type == LEARNING_TYPE.L_EYE_NOSE)
+            if (type == LEARNING_TYPE.L_EYE_NOSE)
             {
                 for (int i = 0; i < FeatureList.Count; i++)
                 {
@@ -251,7 +285,7 @@ namespace MakeSVMFile
                     //                value_array[idx++] = (FeatureList[i].MouthLValueR);
                 }
             }
-            else if(type == LEARNING_TYPE.L_EYE_MOUTH)
+            else if (type == LEARNING_TYPE.L_EYE_MOUTH)
             {
                 for (int i = 0; i < FeatureList.Count; i++)
                 {
@@ -265,7 +299,7 @@ namespace MakeSVMFile
                     //                value_array[idx++] = (FeatureList[i].MouthLValueR);
                 }
             }
-            else if(type == LEARNING_TYPE.R_EYE_MOUTH)
+            else if (type == LEARNING_TYPE.R_EYE_MOUTH)
             {
                 for (int i = 0; i < FeatureList.Count; i++)
                 {
@@ -286,20 +320,51 @@ namespace MakeSVMFile
         /// </summary>
         /// <param name="feature"></param>
         /// <param name="value_array"></param>
-        private void SetFeatureToArray(FaceFeature.FeatureValue feature, ref double[] value_array)
+        private void SetFeatureToArray(FaceFeature.FeatureValue feature, ref double[] value_array, LEARNING_TYPE type)
         {
             int idx = 0;
-            value_array[idx++] = (feature.LeftEyeValueL);
-//            value_array[idx++] = (feature.LeftEyeValueR);
-//            value_array[idx++] = (feature.RightEyeValueL);
-//            value_array[idx++] = (feature.RightEyeValueR);
-            value_array[idx++] = (feature.NoseLValueL);
-//            value_array[idx++] = (feature.NoseLValueR);
-//            value_array[idx++] = (feature.MouthLValueL);
-//            value_array[idx++] = (feature.MouthLValueR);
+            if (type == LEARNING_TYPE.L_EYE_NOSE)
+            {
+                value_array[idx++] = (feature.LeftEyeValueL);
+                //            value_array[idx++] = (feature.LeftEyeValueR);
+                //            value_array[idx++] = (feature.RightEyeValueL);
+                //            value_array[idx++] = (feature.RightEyeValueR);
+                value_array[idx++] = (feature.NoseLValueL);
+                //            value_array[idx++] = (feature.NoseLValueR);
+                //            value_array[idx++] = (feature.MouthLValueL);
+                //            value_array[idx++] = (feature.MouthLValueR);
+            }
+            else if (type == LEARNING_TYPE.L_EYE_MOUTH)
+            {
+                value_array[idx++] = (feature.LeftEyeValueL);
+                //            value_array[idx++] = (feature.LeftEyeValueR);
+                //            value_array[idx++] = (feature.RightEyeValueL);
+                //            value_array[idx++] = (feature.RightEyeValueR);
+                //value_array[idx++] = (feature.NoseLValueL);
+                //            value_array[idx++] = (feature.NoseLValueR);
+                value_array[idx++] = (feature.MouthLValueL);
+                //            value_array[idx++] = (feature.MouthLValueR);
+
+            }
+            else if (type == LEARNING_TYPE.R_EYE_MOUTH)
+            {
+                //value_array[idx++] = (feature.LeftEyeValueL);
+                //            value_array[idx++] = (feature.LeftEyeValueR);
+                value_array[idx++] = (feature.RightEyeValueL);
+                //            value_array[idx++] = (feature.RightEyeValueR);
+                //value_array[idx++] = (feature.NoseLValueL);
+                //            value_array[idx++] = (feature.NoseLValueR);
+                value_array[idx++] = (feature.MouthLValueL);
+                //            value_array[idx++] = (feature.MouthLValueR);
+            }
         }
 
         private bool LoadFlag = false;
         public SVMModel libSVM_model { get; set; }
+
+        public SVMModel libSVM_model_1 { get; set; }
+        public SVMModel libSVM_model_2 { get; set; }
+        public SVMModel libSVM_model_3 { get; set; }
+
     }
 }
