@@ -11,6 +11,13 @@ namespace MakeSVMFile
     {
         const float SVM_COST = 10.0f;
         const float SVM_GAMMA = 100.0f;
+        
+        enum LEARNING_TYPE
+        {
+          L_EYE_NOSE = 0,
+          L_EYE_MOUTH,
+          R_EYE_MOUTH,
+        };
 
         public SVMManage()
         {
@@ -20,10 +27,19 @@ namespace MakeSVMFile
         public void TrainingExec(List<FaceFeature.FeatureValue> FeatureList)
         {
             //３種類の学習ファイルを作る
-            makeLearinigFile(FeatureList, @"debug_Feature.csv", 0);
+            string model_file_1 = @"Feature_L_EYE_NOSE.csv";
+            string model_file_2 = @"Feature_L_EYE_MOUTH.csv";
+            string model_file_3 = @"Feature_R_EYE_MOUTH.csv";
 
-            //学習を実行
-            Training(@"debug_Feature.csv", SVM_GAMMA, SVM_COST);
+            makeLearinigFile(FeatureList, model_file_1, LEARNING_TYPE.L_EYE_NOSE);
+            Training(model_file_1, SVM_GAMMA, SVM_COST);       //学習を実行
+
+            makeLearinigFile(FeatureList, model_file_2, LEARNING_TYPE.L_EYE_MOUTH);
+            Training(model_file_2, SVM_GAMMA, SVM_COST);       //学習を実行
+
+            makeLearinigFile(FeatureList, model_file_3, LEARNING_TYPE.R_EYE_MOUTH);
+            Training(model_file_3, SVM_GAMMA, SVM_COST);       //学習を実行
+
         }
 
         //SVM判定
@@ -103,14 +119,16 @@ namespace MakeSVMFile
             parameter.Gamma = gammma;
 
             libSVM_model = SVM.Train(problem, parameter);
-            //辞書ファイルを出力
+            //辞書ファイルを出力(xmlファイル)
             string xml_name = @"model_" + input_learing_file;
+            xml_name = xml_name.Replace(@".csv", @".xml");
             SVM.SaveModel(libSVM_model, xml_name);
 
             //判定結果をファイルに出してみる
             SVMProblem testProblem = SVMProblemHelper.Load(input_learing_file);
             double[] target = new double[testProblem.Length];
-            using (StreamWriter w = new StreamWriter(@"debug_answer.csv"))
+            string debug_file_str = @"debug_" + input_learing_file;
+            using (StreamWriter w = new StreamWriter(debug_file_str))
             {
                 for (int i = 0; i < testProblem.Length; i++)
                 {
@@ -122,20 +140,20 @@ namespace MakeSVMFile
             //正解率を出す。
             double accuracy = SVMHelper.EvaluateClassificationProblem(testProblem, target);
         }
-            /// <summary>
-        /// 辞書ファイルを作成する
+        /// <summary>
+        /// 学習用のデータファイルを作成する
         /// </summary>
         /// <param name="feature_list">特徴量</param>
         /// <param name="file_name">辞書ファイル名</param>
         /// <param name="type">辞書タイプ</param>
-        private void makeLearinigFile(List<FaceFeature.FeatureValue> feature_list, string file_name,int type)
+        private void makeLearinigFile(List<FaceFeature.FeatureValue> feature_list, string file_name, LEARNING_TYPE type)
         {
             //特徴量をMatに移し替える　2個で一つ
             //2個のfloat * LISTの大きさの配列
             double[] feature_array = new double[2 * feature_list.Count];
 
             //特徴量をSVMで扱えるように配列に置き換える
-            SetFeatureListToArray(feature_list, ref feature_array);
+            SetFeatureListToArray(feature_list, ref feature_array, type);
             //これがラベル番号
             int[] id_array = new int[feature_list.Count];
             for (int i = 0; i < id_array.Length; i++)
@@ -156,7 +174,7 @@ namespace MakeSVMFile
             //学習データを図にする
             Debug_DrawInputFeature(points, id_array);
             //LibSVMで学習させるためのデータを出力
-            OutPut_FeatureAndID(points, id_array);
+            OutPut_FeatureAndID(points, id_array, file_name);
         }
 
         /// <summary>
@@ -164,15 +182,15 @@ namespace MakeSVMFile
         /// </summary>
         /// <param name="points"></param>
         /// <param name="id_array"></param>
-        private void OutPut_FeatureAndID(CvPoint2D32f[] points, int[] id_array)
+        private void OutPut_FeatureAndID(CvPoint2D32f[] points, int[] id_array,string file_name)
         {
-            using (StreamWriter w = new StreamWriter(@"debug_Feature.csv"))
+            using (StreamWriter w = new StreamWriter(file_name))
             {
                 for (int i = 0; i < id_array.Length; i++)
                 {
                     w.Write(id_array[i] + " ");
-                    w.Write("1:" +points[i].X + " ");
-                    w.Write("2:" +points[i].Y + " ");
+                    w.Write("1:" + points[i].X + " ");
+                    w.Write("2:" + points[i].Y + " ");
                     w.Write("\n");
                 }
             }
@@ -214,20 +232,52 @@ namespace MakeSVMFile
         /// </summary>
         /// <param name="FeatureList"></param>
         /// <param name="id_list"></param>
-        private void SetFeatureListToArray(List<FaceFeature.FeatureValue> FeatureList, ref double[] value_array)
+        /// 
+        private void SetFeatureListToArray(List<FaceFeature.FeatureValue> FeatureList, ref double[] value_array, LEARNING_TYPE type)
         {
             int idx = 0;
 
-            for(int i = 0; i < FeatureList.Count;i++)
+            if( type == LEARNING_TYPE.L_EYE_NOSE)
             {
-                value_array[idx++] = (FeatureList[i].LeftEyeValueL);
-//                value_array[idx++] = (FeatureList[i].LeftEyeValueR);
-//                value_array[idx++] = (FeatureList[i].RightEyeValueL);
-//                value_array[idx++] = (FeatureList[i].RightEyeValueR);
-                value_array[idx++] = (FeatureList[i].NoseLValueL);
-//                value_array[idx++] = (FeatureList[i].NoseLValueR);
-//                value_array[idx++] = (FeatureList[i].MouthLValueL);
-//                value_array[idx++] = (FeatureList[i].MouthLValueR);
+                for (int i = 0; i < FeatureList.Count; i++)
+                {
+                    value_array[idx++] = (FeatureList[i].LeftEyeValueL);
+                    //                value_array[idx++] = (FeatureList[i].LeftEyeValueR);
+                    //                value_array[idx++] = (FeatureList[i].RightEyeValueL);
+                    //                value_array[idx++] = (FeatureList[i].RightEyeValueR);
+                    value_array[idx++] = (FeatureList[i].NoseLValueL);
+                    //                value_array[idx++] = (FeatureList[i].NoseLValueR);
+                    //                value_array[idx++] = (FeatureList[i].MouthLValueL);
+                    //                value_array[idx++] = (FeatureList[i].MouthLValueR);
+                }
+            }
+            else if(type == LEARNING_TYPE.L_EYE_MOUTH)
+            {
+                for (int i = 0; i < FeatureList.Count; i++)
+                {
+                    value_array[idx++] = (FeatureList[i].LeftEyeValueL);
+                    //                value_array[idx++] = (FeatureList[i].LeftEyeValueR);
+                    //value_array[idx++] = (FeatureList[i].RightEyeValueL);
+                    //                value_array[idx++] = (FeatureList[i].RightEyeValueR);
+                    //value_array[idx++] = (FeatureList[i].NoseLValueL);
+                    //                value_array[idx++] = (FeatureList[i].NoseLValueR);
+                    value_array[idx++] = (FeatureList[i].MouthLValueL);
+                    //                value_array[idx++] = (FeatureList[i].MouthLValueR);
+                }
+            }
+            else if(type == LEARNING_TYPE.R_EYE_MOUTH)
+            {
+                for (int i = 0; i < FeatureList.Count; i++)
+                {
+                    //value_array[idx++] = (FeatureList[i].LeftEyeValueL);
+                    //                value_array[idx++] = (FeatureList[i].LeftEyeValueR);
+                    value_array[idx++] = (FeatureList[i].RightEyeValueL);
+                    //                value_array[idx++] = (FeatureList[i].RightEyeValueR);
+                    //value_array[idx++] = (FeatureList[i].NoseLValueL);
+                    //                value_array[idx++] = (FeatureList[i].NoseLValueR);
+                    value_array[idx++] = (FeatureList[i].MouthLValueL);
+                    //                value_array[idx++] = (FeatureList[i].MouthLValueR);
+                }
             }
         }
 
