@@ -35,57 +35,34 @@ namespace MakeSVMFile
             //学習ファイルを読み込んでいなかったらロード
             if (this.LoadFlag == false)
             {
-                this.libSVM_model_1 = SVM.LoadModel(@"model_Feature_L_EYE_NOSE.xml");
+                this.libSVM_model_1 = SVM.LoadModel(@"model_FaceFeature.xml");
                 this.LoadFlag = true;
             }
 
-            double[] feature_array = new double[2];
-            int[] answer = new int[3];
+            double[] feature_array = new double[FEATURE_COUNT];
+            int answer = 0;
 
             {
                 SetFeatureToArray(feature, ref feature_array);
 
                 //問題を作成
-                SVMNode[] node_array = new SVMNode[2];
-                node_array[0] = new SVMNode(1, feature_array[0]);
-                node_array[1] = new SVMNode(2, feature_array[1]);
+                SVMNode[] node_array = new SVMNode[FEATURE_COUNT];
 
-                answer[0] = (int)SVM.Predict(libSVM_model_1, node_array);
-                return answer[0];
+                for(int i = 0; i < FEATURE_COUNT; i++)
+                {
+                    node_array[i] = new SVMNode(i+1, feature_array[i]);
+                }
+
+                answer = (int)SVM.Predict(libSVM_model_1, node_array);
+                return answer;
             }
-/*
-            {
-                SetFeatureToArray(feature, ref feature_array, LEARNING_TYPE.L_EYE_MOUTH);
-
-                //問題を作成
-                SVMNode[] node_array = new SVMNode[2];
-                node_array[0] = new SVMNode(1, feature_array[0]);
-                node_array[1] = new SVMNode(2, feature_array[1]);
-
-                answer[1] = (int)SVM.Predict(libSVM_model_2, node_array);
-            }
-            {
-                SetFeatureToArray(feature, ref feature_array, LEARNING_TYPE.R_EYE_MOUTH);
-
-                //問題を作成
-                SVMNode[] node_array = new SVMNode[2];
-                node_array[0] = new SVMNode(1, feature_array[0]);
-                node_array[1] = new SVMNode(2, feature_array[1]);
-
-                answer[2] = (int)SVM.Predict(libSVM_model_2, node_array);
-            }
-*/
-
-            int final = answer[0] + answer[1] + answer[2];
-
-            if(final < 5) { final = 1; }
-            else { final = 2; }
-            return final;
         }
 
         //作成した辞書を図でみる
         public void Debug_DispPredict()
         {
+            return;
+
             //辞書ファイルのロード
             this.libSVM_model = SVM.LoadModel(@"libsvm_model.xml");
 
@@ -167,8 +144,8 @@ namespace MakeSVMFile
         /// <param name="type">辞書タイプ</param>
         private void makeLearinigFile(List<FaceFeature.FeatureValue> feature_list, string file_name)
         {
-            //特徴量をMatに移し替える　2個で一つ
-            //2個のfloat * LISTの大きさの配列
+            //特徴量をMatに移し替える　8個で一つ
+            //8個のfloat * LISTの大きさの配列
             double[] feature_array = new double[FEATURE_COUNT * feature_list.Count];
 
             //特徴量をSVMで扱えるように配列に置き換える
@@ -274,13 +251,13 @@ namespace MakeSVMFile
         {
             int idx = 0;
                 value_array[idx++] = (feature.LeftEyeValueL);
-                //            value_array[idx++] = (feature.LeftEyeValueR);
-                //            value_array[idx++] = (feature.RightEyeValueL);
-                //            value_array[idx++] = (feature.RightEyeValueR);
+                value_array[idx++] = (feature.LeftEyeValueR);
+                value_array[idx++] = (feature.RightEyeValueL);
+                value_array[idx++] = (feature.RightEyeValueR);
                 value_array[idx++] = (feature.NoseLValueL);
-                //            value_array[idx++] = (feature.NoseLValueR);
-                //            value_array[idx++] = (feature.MouthLValueL);
-                //            value_array[idx++] = (feature.MouthLValueR);
+                value_array[idx++] = (feature.NoseLValueR);
+                value_array[idx++] = (feature.MouthLValueL);
+                value_array[idx++] = (feature.MouthLValueR);
         }
 
         private bool LoadFlag = false;
