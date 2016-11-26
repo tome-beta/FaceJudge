@@ -99,7 +99,20 @@ namespace MakeSVMFile
                 if (feature_data.MouthLValueR < min[7]) { min[7] = feature_data.MouthLValueR; }
             }
 
-
+            //正規化の倍率を出力する
+            using (StreamWriter w = new StreamWriter(@"out/normalize_scale.csv"))
+            {
+                for (int i = 0; i < max.Length; i++)
+                {
+                    w.Write(max[i] + ",");
+                }
+                w.Write("\n");
+                for (int i = 0; i < min.Length; i++)
+                {
+                    w.Write(min[i] + ",");
+                }
+                w.Write("\n");
+            }
         }
 
         //===================================================================
