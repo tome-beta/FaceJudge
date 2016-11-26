@@ -162,6 +162,9 @@ namespace JudgeGUII
             //特徴点を出す
             face_feature.DetectFacePoint();
 
+            //特徴点を正規化する
+            face_feature.NormalizeFeature();
+
             //学習実行
             SVMManage svm_manage = new SVMManage();
             svm_manage.TrainingExec(face_feature.FeatuerValueList);

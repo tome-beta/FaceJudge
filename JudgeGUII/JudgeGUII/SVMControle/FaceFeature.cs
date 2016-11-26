@@ -58,7 +58,53 @@ namespace MakeSVMFile
             }
         }
 
-//        iplImageから特徴量をだす処理
+        /// <summary>
+        /// 導き出した特徴量を0から１に正規化する
+        /// 正規化計算ファイルを出力する
+        /// </summary>
+        public void NormalizeFeature()
+        {
+            //最大値と最小値を記録
+            double[] max = new double[8];
+            double[] min = new double[8];
+
+            //１つの特徴量毎に正規化する
+            for(int i = 0; i < 8;i++)
+            {
+                max[i] = double.MinValue;
+                min[i] = double.MaxValue;
+            }
+
+            foreach (FeatureValue feature_data in FeatuerValueList)
+            {
+                //最大と最小をとる
+                if (feature_data.LeftEyeValueL > max[0]){ max[0] = feature_data.LeftEyeValueL;}
+                if (feature_data.LeftEyeValueL < min[0]){ min[0] = feature_data.LeftEyeValueL;}
+                if (feature_data.LeftEyeValueR > max[1]) { max[1] = feature_data.LeftEyeValueR; }
+                if (feature_data.LeftEyeValueR < min[1]) { min[1] = feature_data.LeftEyeValueR; }
+
+                if (feature_data.RightEyeValueL > max[2]) { max[2] = feature_data.RightEyeValueL; }
+                if (feature_data.RightEyeValueL < min[2]) { min[2] = feature_data.RightEyeValueL; }
+                if (feature_data.RightEyeValueR > max[3]) { max[3] = feature_data.RightEyeValueR; }
+                if (feature_data.RightEyeValueR < min[3]) { min[3] = feature_data.RightEyeValueR; }
+
+                if (feature_data.NoseLValueL > max[4]) { max[4] = feature_data.NoseLValueL; }
+                if (feature_data.NoseLValueL < min[4]) { min[4] = feature_data.NoseLValueL; }
+                if (feature_data.NoseLValueR > max[5]) { max[5] = feature_data.NoseLValueR; }
+                if (feature_data.NoseLValueR < min[5]) { min[5] = feature_data.NoseLValueR; }
+
+                if (feature_data.MouthLValueL > max[6]) { max[6] = feature_data.MouthLValueL; }
+                if (feature_data.MouthLValueL < min[6]) { min[6] = feature_data.MouthLValueL; }
+                if (feature_data.MouthLValueR > max[7]) { max[7] = feature_data.MouthLValueR; }
+                if (feature_data.MouthLValueR < min[7]) { min[7] = feature_data.MouthLValueR; }
+            }
+
+
+        }
+
+        //===================================================================
+        // private 
+        //===================================================================
         /// <summary>
         /// ファイル名から特徴量を出す処理
         /// </summary>
