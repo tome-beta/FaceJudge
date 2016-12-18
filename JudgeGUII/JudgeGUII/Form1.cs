@@ -168,6 +168,7 @@ namespace JudgeGUII
             //学習実行
             SVMManage svm_manage = new SVMManage();
             svm_manage.TrainingExec(face_feature.FeatuerValueList);
+            svm_manage.TrainingExec(face_feature.ScaleFeatuerValueList);
 
             //エラー表示
             MessageBox.Show("lisvm_model.xmlを作成しました",

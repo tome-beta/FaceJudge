@@ -11,8 +11,17 @@ namespace MakeSVMFile
     /// </summary>
     class FaceFeature
     {
+        enum NORMALIZE_TYPE
+        {
+            NORMAL,
+            EXTRA,
+        };
+
         const int SMALL_IMAGE_LIMIT = 100;  //顔画像を拡大対象にする
         const int IMAGE_RESIZE_RATE = 4;    //拡大率
+
+        NORMALIZE_TYPE TYPE = NORMALIZE_TYPE.NORMAL;       //0で0.0～1.0　０意外で平均と標準偏差を使う
+
         //各パーツの矩形
         struct PartsRectInfo
         {
@@ -64,55 +73,155 @@ namespace MakeSVMFile
         /// </summary>
         public void NormalizeFeature()
         {
-            //最大値と最小値を記録
-            double[] max = new double[8];
-            double[] min = new double[8];
+            const int DATA_NUM = 8;
 
-            //１つの特徴量毎に正規化する
-            for(int i = 0; i < 8;i++)
+            if(TYPE == NORMALIZE_TYPE.NORMAL)
             {
-                max[i] = double.MinValue;
-                min[i] = double.MaxValue;
-            }
+                //最大値と最小値を記録
+                double[] max = new double[DATA_NUM];
+                double[] min = new double[DATA_NUM];
 
-            foreach (FeatureValue feature_data in FeatuerValueList)
-            {
-                //最大と最小をとる
-                if (feature_data.LeftEyeValueL > max[0]){ max[0] = feature_data.LeftEyeValueL;}
-                if (feature_data.LeftEyeValueL < min[0]){ min[0] = feature_data.LeftEyeValueL;}
-                if (feature_data.LeftEyeValueR > max[1]) { max[1] = feature_data.LeftEyeValueR; }
-                if (feature_data.LeftEyeValueR < min[1]) { min[1] = feature_data.LeftEyeValueR; }
-
-                if (feature_data.RightEyeValueL > max[2]) { max[2] = feature_data.RightEyeValueL; }
-                if (feature_data.RightEyeValueL < min[2]) { min[2] = feature_data.RightEyeValueL; }
-                if (feature_data.RightEyeValueR > max[3]) { max[3] = feature_data.RightEyeValueR; }
-                if (feature_data.RightEyeValueR < min[3]) { min[3] = feature_data.RightEyeValueR; }
-
-                if (feature_data.NoseLValueL > max[4]) { max[4] = feature_data.NoseLValueL; }
-                if (feature_data.NoseLValueL < min[4]) { min[4] = feature_data.NoseLValueL; }
-                if (feature_data.NoseLValueR > max[5]) { max[5] = feature_data.NoseLValueR; }
-                if (feature_data.NoseLValueR < min[5]) { min[5] = feature_data.NoseLValueR; }
-
-                if (feature_data.MouthLValueL > max[6]) { max[6] = feature_data.MouthLValueL; }
-                if (feature_data.MouthLValueL < min[6]) { min[6] = feature_data.MouthLValueL; }
-                if (feature_data.MouthLValueR > max[7]) { max[7] = feature_data.MouthLValueR; }
-                if (feature_data.MouthLValueR < min[7]) { min[7] = feature_data.MouthLValueR; }
-            }
-
-            //正規化の倍率を出力する
-            using (StreamWriter w = new StreamWriter(@"out/normalize_scale.csv"))
-            {
-                for (int i = 0; i < max.Length; i++)
+                //１つの特徴量毎に正規化する
+                for (int i = 0; i < DATA_NUM; i++)
                 {
-                    w.Write(max[i] + ",");
+                    max[i] = double.MinValue;
+                    min[i] = double.MaxValue;
                 }
-                w.Write("\n");
-                for (int i = 0; i < min.Length; i++)
+                foreach (FeatureValue feature_data in FeatuerValueList)
                 {
-                    w.Write(min[i] + ",");
+                    //最大と最小をとる
+                    if (feature_data.LeftEyeValueL > max[0]) { max[0] = feature_data.LeftEyeValueL; }
+                    if (feature_data.LeftEyeValueL < min[0]) { min[0] = feature_data.LeftEyeValueL; }
+                    if (feature_data.LeftEyeValueR > max[1]) { max[1] = feature_data.LeftEyeValueR; }
+                    if (feature_data.LeftEyeValueR < min[1]) { min[1] = feature_data.LeftEyeValueR; }
+
+                    if (feature_data.RightEyeValueL > max[2]) { max[2] = feature_data.RightEyeValueL; }
+                    if (feature_data.RightEyeValueL < min[2]) { min[2] = feature_data.RightEyeValueL; }
+                    if (feature_data.RightEyeValueR > max[3]) { max[3] = feature_data.RightEyeValueR; }
+                    if (feature_data.RightEyeValueR < min[3]) { min[3] = feature_data.RightEyeValueR; }
+
+                    if (feature_data.NoseLValueL > max[4]) { max[4] = feature_data.NoseLValueL; }
+                    if (feature_data.NoseLValueL < min[4]) { min[4] = feature_data.NoseLValueL; }
+                    if (feature_data.NoseLValueR > max[5]) { max[5] = feature_data.NoseLValueR; }
+                    if (feature_data.NoseLValueR < min[5]) { min[5] = feature_data.NoseLValueR; }
+
+                    if (feature_data.MouthLValueL > max[6]) { max[6] = feature_data.MouthLValueL; }
+                    if (feature_data.MouthLValueL < min[6]) { min[6] = feature_data.MouthLValueL; }
+                    if (feature_data.MouthLValueR > max[7]) { max[7] = feature_data.MouthLValueR; }
+                    if (feature_data.MouthLValueR < min[7]) { min[7] = feature_data.MouthLValueR; }
                 }
-                w.Write("\n");
+
+                //正規化の実行
+                for (int i = 0; i < this.FeatuerValueList.Count(); i++)
+                {
+                    FeatureValue tmp = new FeatureValue();
+                    tmp.LeftEyeValueL = (FeatuerValueList[i].LeftEyeValueL - min[0]) / (max[0] - min[0]);
+                    tmp.LeftEyeValueR = (FeatuerValueList[i].LeftEyeValueR - min[1]) / (max[1] - min[1]);
+                    tmp.RightEyeValueL = (FeatuerValueList[i].RightEyeValueL - min[2]) / (max[2] - min[2]);
+                    tmp.RightEyeValueR = (FeatuerValueList[i].RightEyeValueR - min[3]) / (max[3] - min[3]);
+                    tmp.NoseLValueL = (FeatuerValueList[i].NoseLValueL - min[4]) / (max[4] - min[4]);
+                    tmp.NoseLValueR = (FeatuerValueList[i].NoseLValueR - min[5]) / (max[5] - min[5]);
+                    tmp.MouthLValueL = (FeatuerValueList[i].MouthLValueL - min[6]) / (max[6] - min[6]);
+                    tmp.MouthLValueR = (FeatuerValueList[i].MouthLValueR - min[7]) / (max[7] - min[7]);
+
+                    tmp.ID = FeatuerValueList[i].ID;
+                    ScaleFeatuerValueList.Add(tmp);
+                }
+                //正規化の倍率を出力する
+                using (StreamWriter w = new StreamWriter(@"out/normalize_scale.csv"))
+                {
+                    for (int i = 0; i < DATA_NUM; i++)
+                    {
+                        w.Write(max[i] + ",");
+                    }
+                    w.Write("\n");
+                    for (int i = 0; i < DATA_NUM; i++)
+                    {
+                        w.Write(min[i] + ",");
+                    }
+                    w.Write("\n");
+                }
+
             }
+            else
+            {
+                double[] average = new double[DATA_NUM];  //平均値
+                double[] SD = new double[DATA_NUM];       //標準偏差
+
+                //正規化の方法を変えてみる
+                //(x-平均値)/標準偏差
+
+                //平均値をとる
+                int data_num = 0;
+                foreach (FeatureValue feature_data in FeatuerValueList)
+                {
+                    data_num++;
+                    average[0] += feature_data.LeftEyeValueL;
+                    average[1] += feature_data.LeftEyeValueR;
+
+                    average[2] += feature_data.RightEyeValueL;
+                    average[3] += feature_data.RightEyeValueR;
+                    average[4] += feature_data.NoseLValueL;
+                    average[5] += feature_data.NoseLValueR;
+                    average[6] += feature_data.MouthLValueL;
+                    average[7] += feature_data.MouthLValueR;
+                }
+                for (int i = 0; i < DATA_NUM; i++)
+                {
+                    average[i] /= FeatuerValueList.Count;
+                }
+
+                //標準偏差
+                double[] tmp = new double[DATA_NUM];
+                foreach (FeatureValue feature_data in FeatuerValueList)
+                {
+                    tmp[0] += Math.Pow(feature_data.LeftEyeValueL - average[0], 2);
+                    tmp[1] += Math.Pow(feature_data.LeftEyeValueR - average[1], 2);
+                    tmp[2] += Math.Pow(feature_data.RightEyeValueL - average[2], 2);
+                    tmp[3] += Math.Pow(feature_data.RightEyeValueR - average[3], 2);
+                    tmp[4] += Math.Pow(feature_data.NoseLValueL - average[4], 2);
+                    tmp[5] += Math.Pow(feature_data.NoseLValueR - average[5], 2);
+                    tmp[6] += Math.Pow(feature_data.MouthLValueL - average[6], 2);
+                    tmp[7] += Math.Pow(feature_data.MouthLValueR - average[7], 2);
+                }
+                for (int i = 0; i < DATA_NUM; i++)
+                {
+                    SD[i] = Math.Sqrt(tmp[i] / FeatuerValueList.Count);
+                }
+
+                //正規化の実行
+                for (int i = 0; i < this.FeatuerValueList.Count(); i++)
+                {
+                    FeatureValue value = new FeatureValue();
+                    value.LeftEyeValueL = (FeatuerValueList[i].LeftEyeValueL - average[0]) / SD[0];
+                    value.LeftEyeValueR = (FeatuerValueList[i].LeftEyeValueR - average[1]) / SD[1];
+                    value.RightEyeValueL = (FeatuerValueList[i].RightEyeValueL - average[2]) / SD[2];
+                    value.RightEyeValueR = (FeatuerValueList[i].RightEyeValueR - average[3]) / SD[3];
+                    value.NoseLValueL = (FeatuerValueList[i].NoseLValueL - average[4]) / SD[4];
+                    value.NoseLValueR = (FeatuerValueList[i].NoseLValueR - average[5]) / SD[5];
+                    value.MouthLValueL = (FeatuerValueList[i].MouthLValueL - average[6]) / SD[6];
+                    value.MouthLValueR = (FeatuerValueList[i].MouthLValueR - average[7]) / SD[7];
+
+                    //ID登録
+                    value.ID = FeatuerValueList[i].ID;
+                    ScaleFeatuerValueList.Add(value);
+                }
+                //正規化の倍率を出力する
+                using (StreamWriter w = new StreamWriter(@"out/normalize_scale.csv"))
+                {
+                    for (int i = 0; i < DATA_NUM; i++)
+                    {
+                        w.Write(average[i] + ",");
+                    }
+                    w.Write("\n");
+                    for (int i = 0; i < DATA_NUM; i++)
+                    {
+                        w.Write(SD[i] + ",");
+                    }
+                    w.Write("\n");
+                }
+            }
+
         }
 
         //===================================================================
@@ -515,9 +624,24 @@ namespace MakeSVMFile
         //=========================================================
         public List<string> FaceList { get; set; }
         public List<int> IDList { get; set; }
+
+        private NORMALIZE_TYPE TYPE1
+        {
+            get
+            {
+                return TYPE;
+            }
+
+            set
+            {
+                TYPE = value;
+            }
+        }
+
         public String OutPutFolda = @"";
 
         public List<FeatureValue> FeatuerValueList = new List<FeatureValue>(); //特徴量のLIST
+        public List<FeatureValue> ScaleFeatuerValueList = new List<FeatureValue>(); //特徴量を正規化したリスト
 
         CvRect RightEyeRect, LeftEyeRect, NoseRect, MouthRect;        //パーツの座標
         CvSeq<CvAvgComp> EyeResult, NoseResult, MouthResult;          //パーツ検出結果

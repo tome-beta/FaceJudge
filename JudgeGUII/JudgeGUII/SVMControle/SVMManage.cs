@@ -21,11 +21,11 @@ namespace MakeSVMFile
         //学習ファイルの作成
         public void TrainingExec(List<FaceFeature.FeatureValue> FeatureList)
         {
-            //３種類の学習ファイルを作る
-            string model_file_1 = @"FaceFeature.csv";
+            //学習ファイルを作る
+            string model_file = @"FaceFeature.csv";
 
-            makeLearinigFile(FeatureList, model_file_1);
-            Training(model_file_1, SVM_GAMMA, SVM_COST);       //学習を実行
+            makeLearinigFile(FeatureList, model_file);
+            Training(model_file, SVM_GAMMA, SVM_COST);       //学習を実行
 
         }
 
@@ -39,11 +39,16 @@ namespace MakeSVMFile
                 this.LoadFlag = true;
             }
 
+            //スケーリングファイルを読み込む　あれば
+
+
             double[] feature_array = new double[FEATURE_COUNT];
             int answer = 0;
 
             {
                 SetFeatureToArray(feature, ref feature_array);
+
+                //ここでスケーリングのデータを読み込んでいたら使う
 
                 //問題を作成
                 SVMNode[] node_array = new SVMNode[FEATURE_COUNT];
@@ -113,6 +118,8 @@ namespace MakeSVMFile
             parameter.Kernel = LibSVMsharp.SVMKernelType.RBF;
             parameter.C = cost;
             parameter.Gamma = gammma;
+
+            //svmModelが上手く作れていない？ラベルが付けられてない！！
 
             libSVM_model = SVM.Train(problem, parameter);
             //辞書ファイルを出力(xmlファイル)
@@ -260,12 +267,21 @@ namespace MakeSVMFile
                 value_array[idx++] = (feature.MouthLValueR);
         }
 
+        /// <summary>
+        /// スケーリングのファイルを読み込む
+        /// </summary>
+        /// <param name="file_name"></param>
+        /// <returns></returns>
+        private bool ReadScaleFile(string file_name)
+        {
+            //ファイルを読み込む
+
+
+            return false;
+        }
+
         private bool LoadFlag = false;
         public SVMModel libSVM_model { get; set; }
-
-        public SVMModel libSVM_model_1 { get; set; }
-        public SVMModel libSVM_model_2 { get; set; }
-        public SVMModel libSVM_model_3 { get; set; }
 
     }
 }
