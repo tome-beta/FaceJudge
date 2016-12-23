@@ -85,6 +85,7 @@
     <Compile Include="InputDataModel.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Setting.cs" />
     <Compile Include="SVMControle\FaceFeature.cs" />
     <Compile Include="SVMControle\libSVM\Core\libsvm.cs" />
     <Compile Include="SVMControle\libSVM\Core\svm_model.cs" />

@@ -35,20 +35,26 @@ namespace MakeSVMFile
             //学習ファイルを読み込んでいなかったらロード
             if (this.LoadFlag == false)
             {
-                this.libSVM_model_1 = SVM.LoadModel(@"model_FaceFeature.xml");
+                this.libSVM_model = SVM.LoadModel(@"model_FaceFeature.xml");
                 this.LoadFlag = true;
             }
 
             //スケーリングファイルを読み込む　あれば
-
+            if(this.LoadScaleFlag == false && JudgeGUII.APPSetting.NORMALIZE_USE)
+            {
+                this.LoadScaleFlag = ReadScaleFile(@"out/normalize_scale.csv");
+            }
 
             double[] feature_array = new double[FEATURE_COUNT];
             int answer = 0;
 
             {
                 SetFeatureToArray(feature, ref feature_array);
-
                 //ここでスケーリングのデータを読み込んでいたら使う
+                if (this.LoadScaleFlag == true && JudgeGUII.APPSetting.NORMALIZE_USE)
+                {
+                    execNormalize(ref feature_array);
+                }
 
                 //問題を作成
                 SVMNode[] node_array = new SVMNode[FEATURE_COUNT];
@@ -58,7 +64,7 @@ namespace MakeSVMFile
                     node_array[i] = new SVMNode(i+1, feature_array[i]);
                 }
 
-                answer = (int)SVM.Predict(libSVM_model_1, node_array);
+                answer = (int)SVM.Predict(libSVM_model, node_array);
                 return answer;
             }
         }
@@ -274,14 +280,55 @@ namespace MakeSVMFile
         /// <returns></returns>
         private bool ReadScaleFile(string file_name)
         {
+            bool ret = false;
             //ファイルを読み込む
+            //リストファイルと読みこんでファイル名をとる
+            using (StreamReader sr = new StreamReader(file_name))
+            {
+                //1行づつ読み込む
+                sr.Peek();
+                {
+                    // カンマ区切りで分割して配列に格納する
+                    string[] stArrayData = sr.ReadLine().Split(',');
 
+                    for(int i = 0; i < FEATURE_NUM;i++)
+                    {
+                        scale_value_1[i] = double.Parse(stArrayData[i]);
+                    }
+                }
+                sr.Peek();
+                {
+                    // カンマ区切りで分割して配列に格納する
+                    string[] stArrayData = sr.ReadLine().Split(',');
 
-            return false;
+                    for (int i = 0; i < FEATURE_NUM; i++)
+                    {
+                        scale_value_2[i] = double.Parse(stArrayData[i]);
+                    }
+                }
+                ret = true;
+            }
+            return ret;
+        }
+
+        /// <summary>
+        /// 正規化を実行
+        /// </summary>
+        private void execNormalize(ref double[] feature_array)
+        {
+            for(int i = 0; i < FEATURE_NUM;i++)
+            {
+                feature_array[i] = (feature_array[i] - scale_value_2[i]) / (scale_value_1[i] - scale_value_2[i]);
+            }
         }
 
         private bool LoadFlag = false;
+        private bool LoadScaleFlag = false;
         public SVMModel libSVM_model { get; set; }
+
+        private const int FEATURE_NUM = 8;
+        private double[] scale_value_1 = new double[FEATURE_NUM];
+        private double[] scale_value_2 = new double[FEATURE_NUM];
 
     }
 }

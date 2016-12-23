@@ -159,16 +159,22 @@ namespace JudgeGUII
             face_feature.IDList = this.IDList;
             face_feature.OutPutFolda = this.OutPutFolda;
 
+            //学習実行
+            SVMManage svm_manage = new SVMManage();
+
             //特徴点を出す
             face_feature.DetectFacePoint();
 
-            //特徴点を正規化する
-            face_feature.NormalizeFeature();
-
-            //学習実行
-            SVMManage svm_manage = new SVMManage();
-            svm_manage.TrainingExec(face_feature.FeatuerValueList);
-            svm_manage.TrainingExec(face_feature.ScaleFeatuerValueList);
+            if (APPSetting.NORMALIZE_USE)
+            {
+                //特徴点を正規化する
+                face_feature.NormalizeFeature();
+                svm_manage.TrainingExec(face_feature.ScaleFeatuerValueList);
+            }
+            else
+            {
+                svm_manage.TrainingExec(face_feature.FeatuerValueList);
+            }
 
             //エラー表示
             MessageBox.Show("lisvm_model.xmlを作成しました",
@@ -195,8 +201,6 @@ namespace JudgeGUII
                     this.FaceList.Add(stArrayData[0]);
                     this.IDList.Add(int.Parse(stArrayData[1]));
                 }
-                //閉じる
-                sr.Close();
             }
         }
 
